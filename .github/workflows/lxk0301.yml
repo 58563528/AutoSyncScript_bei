@@ -6,7 +6,7 @@ on:
   watch:
     types: started
   repository_dispatch:
-    types: sync-ElsaKing-DogDog
+    types: sync-chinnkarahoi-jd_scripts
 jobs:
   repo-sync:
     env:
@@ -18,11 +18,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: sync ElsaKing-DogDog
+      - name: sync chinnkarahoi-jd_scripts
         uses: repo-sync/github-sync@v2
         if: env.PAT
         with:
-          source_repo: "https://github.com/ElsaKing/DogDog.git"
-          source_branch: "main"
+          source_repo: "https://github.com/chinnkarahoi/jd_scripts.git"
+          source_branch: "master"
           destination_branch: "lxk0301"
           github_token: ${{ secrets.PAT }}
