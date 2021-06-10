@@ -1,7 +1,7 @@
 name: lxk0301-sync
 on:
   schedule:
-    - cron: '4 */3 * * *'
+    - cron: ''
   workflow_dispatch:
   watch:
     types: started
