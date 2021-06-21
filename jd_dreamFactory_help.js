@@ -127,6 +127,7 @@ if ($.isNode()) {
     })
 
 async function jdDreamFactory() {
+  console.log("window._CONFIG",window._CONFIG)
   try {
     await userInfo();
     await QueryFriendList();//查询今日招工情况以及剩余助力次数
