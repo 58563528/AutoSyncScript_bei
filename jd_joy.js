@@ -113,10 +113,12 @@ async function jdJoy() {
         }
       }
       await feedPets(FEED_NUM);//喂食
-      await Promise.all([
-        petTask(),
-        appPetTask()
-      ])
+      await Promise.all([petTask(),
+        appPetTask()]).then((result) => {
+        console.log(result)               
+      }).catch((error) => {
+        console.log(error)
+      })
       await deskGoodsTask();//限时货柜
       await enterRoom();
       await joinTwoPeopleRun()//参加双人赛跑
