@@ -98,103 +98,44 @@ const JD_API_HOST = `https://api.m.jd.com/api?appid=jdsupermarket`;
   .finally(() => $.done())
 async function PrizeIndex() {
   await smtg_queryPrize();
-  // await smtg_materialPrizeIndex();//兑换酒类奖品，此兑换API与之前的兑换京豆类的不一致，故目前无法进行
-  // await Promise.all([
-  //   smtg_queryPrize(),
-  //   smtg_materialPrizeIndex()
-  // ])
-  // const prizeList = [...$.queryPrizeData, ...$.materialPrizeIndex];
+
   const prizeList = [...$.queryPrizeData];
   if (prizeList && prizeList.length) {
-    if (`${coinToBeans}` === '1000') {
-      if (prizeList[0] && prizeList[0].type === 3) {
-        console.log(`查询换${prizeList[0].name}ID成功，ID:${prizeList[0].prizeId}`)
-        $.title = prizeList[0].name;
-        $.blueCost = prizeList[0].cost;
-      } else {
-        console.log(`查询换1000京豆ID失败`)
-        $.beanerr = `东哥今天不给换`;
-        return ;
-      }
-      if (prizeList[0] && prizeList[0].inStock === 506) {
-        $.beanerr = `失败，1000京豆领光了，请明天再来`;
-        return ;
-      }
-      if (prizeList[0] && prizeList[0].limit === prizeList[0] && prizeList[0].finished) {
-        $.beanerr = `${prizeList[0].name}`;
-        return ;
-      }
-      //兑换1000京豆
-      if ($.totalBlue > $.blueCost) {
-        await smtg_obtainPrize(prizeList[0].prizeId);
-      } else {
-        console.log(`兑换失败,您目前蓝币${$.totalBlue}个,不足以兑换${$.title}所需的${$.blueCost}个`);
-        $.beanerr = `兑换失败,您目前蓝币${$.totalBlue}个,不足以兑换${$.title}所需的${$.blueCost}个`;
-      }
-    } else if (`${coinToBeans}` === '20') {
-      if (prizeList[1] && prizeList[1].type === 3) {
-        console.log(`查询换${prizeList[1].name}ID成功，ID:${prizeList[1].prizeId}`)
-        $.title = prizeList[1].name;
-        $.blueCost = prizeList[1].cost;
-      } else {
-        console.log(`查询换万能的京豆ID失败`)
-        $.beanerr = `东哥今天不给换`;
-        return ;
-      }
-      if (prizeList[0] && prizeList[0].inStock === 506) {
-        console.log(`失败，万能的京豆领光了，请明天再来`);
-        $.beanerr = `失败，万能的京豆领光了，请明天再来`;
-        return ;
-      }
-      if ((prizeList[0] && prizeList[0].limit) === (prizeList[0] && prizeList[0].finished)) {
-        $.beanerr = `${prizeList[0].name}`;
-        return ;
-      }
-      //兑换万能的京豆(1-20京豆)
-      if ($.totalBlue > $.blueCost) {
-        await smtg_obtainPrize(prizeList[0].prizeId,1000);
-      } else {
-        console.log(`兑换失败,您目前蓝币${$.totalBlue}个,不足以兑换${$.title}所需的${$.blueCost}个`);
-        $.beanerr = `兑换失败,您目前蓝币${$.totalBlue}个,不足以兑换${$.title}所需的${$.blueCost}个`;
-      }
-    } else {
-      //自定义输入兑换
-      console.log(`\n\n温馨提示：需兑换商品的名称设置请尽量与其他商品有区分度，否则可能会兑换成其他类似商品\n\n`)
-      let prizeId = '', i;
-      for (let index = 0; index < prizeList.length; index ++) {
-        if (prizeList[index].name.indexOf(coinToBeans) > -1) {
-          prizeId = prizeList[index].prizeId;
-          i = index;
-          $.title = prizeList[index].name;
-          $.blueCost = prizeList[index].cost;
-          $.type = prizeList[index].type;
-          $.beanType = prizeList[index].hasOwnProperty('beanType');
-        }
-      }
-      if (prizeId) {
-        if (prizeList[i].inStock === 506 || prizeList[i].inStock === -1) {
-          console.log(`失败，您输入设置的${coinToBeans}领光了，请明天再来`);
-          $.beanerr = `失败，您输入设置的${coinToBeans}领光了，请明天再来`;
-          return ;
-        }
-        if ((prizeList[i].targetNum) && prizeList[i].targetNum === prizeList[i].finishNum) {
-          $.beanerr = `${prizeList[0].subTitle}`;
-          return ;
-        }
-        if ($.totalBlue > $.blueCost) {
-          if ($.type === 4 && !$.beanType) {
-            await smtg_obtainPrize(prizeId, 0, "smtg_lockMaterialPrize")
-          } else {
-            await smtg_obtainPrize(prizeId);
+    for (const item of prizeList) {
+      var amount = item.amount;
+      if(coinToBeans == amount){
+        var limit = item.limit;
+        if(limit){
+          for(var i = 0;i<limit;i++){
+            if(item.type === 3){
+              console.log(`查询换${item.name}ID成功，ID:${item.prizeId}`)
+              $.title = item.name;
+              $.blueCost = item.cost;
+
+              if (item.inStock === 506) {
+                $.beanerr = `失败，${amount}京豆领光了，请明天再来`;
+                return;
+              }
+              if (item.finished) {
+                $.beanerr = `${item.name}`;
+                return;
+              }
+              //兑换京豆
+              if ($.totalBlue > $.blueCost) {
+                await smtg_obtainPrize(item.prizeId);
+              } else {
+                console.log(`兑换失败,您目前蓝币${$.totalBlue}个,不足以兑换${$.title}所需的${$.blueCost}个`);
+                $.beanerr = `兑换失败,您目前蓝币${$.totalBlue}个,不足以兑换${$.title}所需的${$.blueCost}个`;
+              }
+            }else{
+              // console.log(`查询换1000京豆ID失败`)
+              // $.beanerr = `东哥今天不给换`;
+              // return ;
+            }
           }
-        } else {
-          console.log(`兑换失败,您目前蓝币${$.totalBlue}个,不足以兑换${$.title}所需的${$.blueCost}个`);
-          $.beanerr = `兑换失败,您目前蓝币${$.totalBlue}个,不足以兑换${$.title}所需的${$.blueCost}个`;
         }
-      } else {
-        console.log(`奖品兑换列表【${coinToBeans}】已下架，请检查活动页面是否存在此商品，如存在请检查您的输入是否正确`);
-        $.beanerr = `奖品兑换列表【${coinToBeans}】已下架`;
       }
+      console.log(`item`,item)
     }
   }
 }
