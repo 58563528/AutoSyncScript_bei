@@ -1,116 +1,78 @@
-/**
-*
-  Name: 京喜财富岛超值兑换
-  Update: 2021/1/6 22:30
-  
-  Quantumult X:
-  [task_local]
-    30 6,12,22 * * * https://raw.githubusercontent.com/moposmall/Script/main/Me/jx_cfd_exchange.js, tag=京喜财富岛兑换提醒, img-url=https://raw.githubusercontent.com/58xinian/icon/master/jxcfd.png, enabled=true
-  Loon:
-  [Script]
-    cron "30 6,12,22 * * *" script-path=https://raw.githubusercontent.com/moposmall/Script/main/Me/jx_cfd_exchange.js,tag=京喜财富岛兑换提醒
-  Surge:
-    京喜财富岛兑换提醒 = type=cron,cronexp="30 6,12,22 * * *",wake-system=1,timeout=20,script-path=https://raw.githubusercontent.com/moposmall/Script/main/Me/jx_cfd_exchange.js
-*
-**/
-
-const $ = new Env("京喜财富岛超值兑换");
+/*
+京喜财富岛提现
+活动地址: 京喜-财富岛
+活动时间：长期
+更新时间：2021-06-4 12:00
+脚本兼容: QuantumultX, Surge,Loon, JSBox, Node.js
+ 获取Token方式：
+  打开【❗️京喜农场❗️】，手动任意完成<工厂任务>、<签到任务>、<金牌厂长任务>一项，提示获取cookie成功即可，然后退出跑任务脚本
+ */
+const $ = new Env("京喜财富岛提现");
 const JD_API_HOST = "https://m.jingxi.com/";
-const notify = $.isNode() ? require('./sendNotify') : '';
 const jdCookieNode = $.isNode() ? require("./jdCookie.js") : "";
+const jdTokenNode = $.isNode() ? require('./jdJxncTokens.js') : '';
 $.result = [];
 $.cookieArr = [];
 $.currentCookie = '';
+$.tokenArr = [];
+$.currentToken = {};
+$.strPhoneID = '';
+$.strPgUUNum = '';
+$.userName = '';
 
 !(async () => {
   if (!getCookies()) return;
+  if (!getTokens()) return;
   for (let i = 0; i < $.cookieArr.length; i++) {
     $.currentCookie = $.cookieArr[i];
+    $.currentToken = $.tokenArr[i];
     if ($.currentCookie) {
       $.userName =  decodeURIComponent($.currentCookie.match(/pt_pin=(.+?);/) && $.currentCookie.match(/pt_pin=(.+?);/)[1]);
-      $.index = i + 1;
-      $.nickName = '';
-      $.log(`开始【京东账号${i + 1}】${$.userName}`);
-      $.result.push(`==============🎁财富超值兑换🎁==============`);
-      await getExchange();
+      $.log(`\n开始【京东账号${i + 1}】${$.userName}`);
+
+      await cashOut();
     }
   }
   await showMsg();
 })()
-  .catch((e) => $.logErr(e))
-  .finally(() => $.done());
+    .catch((e) => $.logErr(e))
+    .finally(() => $.done());
 
-function getExchange() {
+function cashOut() {
   return new Promise(async (resolve) => {
-    $.get(taskUrl(`task/QueryAllConfig`), async (err, resp, data) => { 
-      try {
-        const { 
-          iRet, 
-          sData:{ 
-            exchangeCfg:[{ 
-              materialData = [{}], 
-              hbData = [{}], 
-              couponData = [{}] 
-            }] 
-          }, 
-          sErrMsg 
-        } = JSON.parse(data);
-/**        
-        $.log(
-          JSON.stringify(materialData,null,2),
-          JSON.stringify(hbData,null,2),
-          JSON.stringify(couponData,null,2)
-        );
-**/        
-        await exchangeInfo('material', materialData);
-        await exchangeInfo('hb', hbData);
-        await exchangeInfo('coupon', couponData);
-        
-      } catch (e) {
-        $.logErr(e, resp);
-      } finally {
-        resolve();
-      }
-    });
+    $.get(
+        taskUrl(
+            `consume/CashOut`,
+            `ddwMoney=100&dwIsCreateToken=0&ddwMinPaperMoney=150000&strPgtimestamp=${$.currentToken['timestamp']}&strPhoneID=${$.currentToken['phoneid']}&strPgUUNum=${$.currentToken['farm_jstoken']}`
+        ),
+        async (err, resp, data) => {
+          try {
+            $.log(data);
+            const { iRet, sErrMsg } = JSON.parse(data);
+            $.log(sErrMsg);
+            $.result.push(`【${$.userName}】\n ${sErrMsg == "" ? sErrMsg="今天手气太棒了" : sErrMsg}`);
+            resolve(sErrMsg);
+          } catch (e) {
+            $.logErr(e, resp);
+          } finally {
+            resolve();
+          }
+        }
+    );
   });
-}
-
-async function exchangeInfo (ex_type, ex_data) {
-    for (let i = 0; i < ex_data.length; i++) {
-      const { levelstatus, name, goldNum, paper } = ex_data[i];
-      switch (ex_type) {
-        case 'material':
-          if(levelstatus === true) {
-            $.result.push(`🛍【${name}】:    💵财富值: ${paper}    ${ goldNum ? `💰元宝: ${goldNum}` : ''}`);
-          }
-          break;
-        case 'hb':
-          if(levelstatus === true) {
-            $.result.push(`🧧【${name}】:    💵财富值: ${paper}    ${ goldNum ? `💰元宝: ${goldNum}` : ''}`);
-          }
-          break;
-        case 'coupon':
-          if(levelstatus === true) {
-            $.result.push(`🛒【${name}】:    💵财富值: ${paper}    ${ goldNum ? `💰元宝: ${goldNum}` : ''}`);
-          }
-          break;
-        default:
-          break;
-      }
-    }
 }
 
 function taskUrl(function_path, body) {
   return {
-    url: `${JD_API_HOST}jxcfd/${function_path}?strZone=jxcfd&bizCode=jxcfd&source=jxcfd&dwEnv=7&_cfd_t=${Date.now()}&ptag=138631.26.55&${body}&_ste=1&_=${Date.now()}&sceneval=2&g_login_type=1&g_ty=ls`,
+    url: `${JD_API_HOST}jxcfd/${function_path}?strZone=jxcfd&bizCode=jxcfd&source=jxcfd&dwEnv=7&_cfd_t=${Date.now()}&ptag=&${body}&_stk=_cfd_t%2CbizCode%2CddwMinPaperMoney%2CddwMoney%2CdwEnv%2CdwIsCreateToken%2Cptag%2Csource%2CstrPgUUNum%2CstrPgtimestamp%2CstrPhoneID%2CstrZone&_ste=1&_=${Date.now()}&sceneval=2&g_login_type=1&g_ty=ls`,
     headers: {
       Cookie: $.currentCookie,
       Accept: "*/*",
       Connection: "keep-alive",
-      Referer:"https://st.jingxi.com/fortune_island/index.html?ptag=138631.26.55",
+      Referer:"https://st.jingxi.com/fortune_island/cash.html?jxsid=16115391812299482601&_f_i_jxapp=1",
       "Accept-Encoding": "gzip, deflate, br",
       Host: "m.jingxi.com",
-      "User-Agent":"jdpingou;iPad;3.15.2;14.2;c18613cab073b19ba6d9f4e49695c585997ad5e7;network/wifi;model/iPad7,5;appBuild/100365;ADID/00000000-0000-0000-0000-000000000000;supportApplePay/1;hasUPPay/0;pushNoticeIsOpen/0;hasOCPay/0;supportBestPay/0;session/68;pap/JA2015_311210;brand/apple;supportJDSHWK/1;Mozilla/5.0 (iPad; CPU OS 14_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",
+      "User-Agent":"jdpingou;iPhone;4.1.4;14.3;9f08e3faf2c0b4e72900552400dfad2e7b2273ba;network/wifi;model/iPhone11,6;appBuild/100415;ADID/00000000-0000-0000-0000-000000000000;supportApplePay/1;hasUPPay/0;pushNoticeIsOpen/0;hasOCPay/0;supportBestPay/0;session/428;pap/JA2019_3111789;brand/apple;supportJDSHWK/1;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",
       "Accept-Language": "zh-cn",
     },
   };
@@ -120,16 +82,35 @@ function getCookies() {
   if ($.isNode()) {
     $.cookieArr = Object.values(jdCookieNode);
   } else {
-    $.cookieArr = [$.getdata("CookieJD") || "", $.getdata("CookieJD2") || ""];
+    const CookiesJd = JSON.parse($.getdata("CookiesJD") || "[]").filter(x => !!x).map(x => x.cookie);
+    $.cookieArr = [$.getdata("CookieJD") || "", $.getdata("CookieJD2") || "", ...CookiesJd];
   }
   if (!$.cookieArr[0]) {
     $.msg(
-      $.name,
-      "【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取",
-      "https://bean.m.jd.com/",
-      {
-        "open-url": "https://bean.m.jd.com/",
-      }
+        $.name,
+        "【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取",
+        "https://bean.m.jd.com/",
+        {
+          "open-url": "https://bean.m.jd.com/",
+        }
+    );
+    return false;
+  }
+  return true;
+}
+
+function getTokens() {
+  if ($.isNode()) {
+    Object.keys(jdTokenNode).forEach((item) => {
+      $.tokenArr.push(jdTokenNode[item] ? JSON.parse(jdTokenNode[item]) : '{}');
+    })
+  } else {
+    $.tokenArr = JSON.parse($.getdata('jx_tokens') || '[]');
+  }
+  if (!$.tokenArr[0]) {
+    $.msg(
+        $.name,
+        "【⏰提示】请先获取京喜Token\n获取方式见脚本说明"
     );
     return false;
   }
@@ -137,22 +118,19 @@ function getCookies() {
 }
 
 function showMsg() {
-  return new Promise(async (resolve) => {
+  return new Promise((resolve) => {
     if ($.notifyTime) {
       const notifyTimes = $.notifyTime.split(",").map((x) => x.split(":"));
       const now = $.time("HH:mm").split(":");
       $.log(`\n${JSON.stringify(notifyTimes)}`);
       $.log(`\n${JSON.stringify(now)}`);
       if (
-        notifyTimes.some((x) => x[0] === now[0] && (!x[1] || x[1] === now[1]))
+          notifyTimes.some((x) => x[0] === now[0] && (!x[1] || x[1] === now[1]))
       ) {
         $.msg($.name, "", `\n${$.result.join("\n")}`);
       }
     } else {
       $.msg($.name, "", `\n${$.result.join("\n")}`);
-    }
-    if ($.isNode()) {
-      await notify.sendNotify(`${$.name} - 账号${$.index} - ${$.nickName}`, `账号${$.index}：${$.nickName || $.userName}\n${$.result.join("\n")}`);
     }
     resolve();
   });
