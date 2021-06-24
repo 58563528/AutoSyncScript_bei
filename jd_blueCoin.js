@@ -116,11 +116,13 @@ async function PrizeIndex() {
     for (const item of prizeList) {
       //已经兑换过，跳过
       if(item.finished){
+        console.log(`你已经兑换过${item.name}，跳过当前兑换，准备下一级别兑换`)
         continue;
       }
 
       var amount = item.amount;
-      $.blueCost = item.cost;//花费
+      $.title = item.name;
+      $.blueCost = item.cost;
 
       //有足够的豆
       if ($.totalBlue > $.blueCost) {
@@ -130,9 +132,6 @@ async function PrizeIndex() {
           for(var i = 0;i<limit;i++){
             if(item.type === 3){
               console.log(`查询换${item.name}ID成功，ID:${item.prizeId}`)
-              $.title = item.name;
-              $.blueCost = item.cost;
-
               if (item.inStock === 506) {
                 $.beanerr = `失败，${amount}京豆领光了，请明天再来`;
                 return;
@@ -152,6 +151,9 @@ async function PrizeIndex() {
             }
           }
         }
+      }else{
+        console.log(`兑换失败,您目前蓝币${$.totalBlue}个,不足以兑换${$.title}所需的${$.blueCost}个`);
+        $.beanerr = `兑换失败,您目前蓝币${$.totalBlue}个,不足以兑换${$.title}所需的${$.blueCost}个`;
       }
       console.log(`item`,item)
     }
