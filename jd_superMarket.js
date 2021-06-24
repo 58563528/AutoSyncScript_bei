@@ -21,8 +21,6 @@ const $ = new Env('东东超市');
 //Node.js用户请在jdCookie.js处填写京东ck;
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [], cookie = '', jdSuperMarketShareArr = [], notify, newShareCodes;
-let helpAu = true;//给作者助力 免费拿,极速版拆红包,省钱大赢家等活动.默认true是,false不助力.
-helpAu = $.isNode() ? (process.env.HELP_AUTHOR ? process.env.HELP_AUTHOR === 'true' : helpAu) : helpAu;
 let jdNotify = true;//用来是否关闭弹窗通知，true表示关闭，false表示开启。
 let superMarketUpgrade = true;//自动升级,顺序:解锁升级商品、升级货架,true表示自动升级,false表示关闭自动升级
 let businessCircleJump = true;//小于对方300热力值自动更换商圈队伍,true表示运行,false表示禁止
@@ -81,24 +79,21 @@ async function jdSuperMarket() {
     await receiveGoldCoin();//收金币
     await businessCircleActivity();//商圈活动
     await receiveBlueCoin();//收蓝币（小费）
-    // await receiveLimitProductBlueCoin();//收限时商品的蓝币
+    await receiveLimitProductBlueCoin();//收限时商品的蓝币
     await daySign();//每日签到
     await BeanSign()//
     await doDailyTask();//做日常任务，分享，关注店铺，
-    // await help();//商圈助力
-    //await smtgQueryPkTask();//做商品PK任务
+    await help();//商圈助力
+    await smtgQueryPkTask();//做商品PK任务
     await drawLottery();//抽奖功能(招财进宝)
-    // await myProductList();//货架
-    // await upgrade();//升级货架和商品
-    // await manageProduct();
-    // await limitTimeProduct();
+    await myProductList();//货架
+    await upgrade();//升级货架和商品
+    await manageProduct();
+    await limitTimeProduct();
     await smtg_shopIndex();
     await smtgHome();
     await receiveUserUpgradeBlue();
     await Home();
-    if (helpAu === true) {
-      await helpAuthor();
-    }
   } catch (e) {
     $.logErr(e)
   }
@@ -135,12 +130,13 @@ async function drawLottery() {
   }
 }
 async function help() {
-  return
   console.log(`\n开始助力好友`);
-  for (let code of newShareCodes) {
-    if (!code) continue;
-    const res = await smtgDoAssistPkTask(code);
-    console.log(`助力好友${JSON.stringify(res)}`);
+  if(newShareCodes){
+    for (let code of newShareCodes) {
+      if (!code) continue;
+      const res = await smtgDoAssistPkTask(code);
+      console.log(`助力好友${JSON.stringify(res)}`);
+    }
   }
 }
 async function doDailyTask() {
@@ -194,6 +190,15 @@ async function doDailyTask() {
         //关注商品领蓝币
         if (item.taskStatus === 0) {
           console.log('关注商品')
+          const itemId = item.content[item.type].itemId;
+          const res = await smtgDoShopTask(item.taskId, itemId);
+          console.log(`${item.subTitle}结果${JSON.stringify(res)}`);
+        }
+      }
+      if (item.type === 12){
+        //加购任务
+        if (item.taskStatus === 0){
+          console.log('开始加购任务');
           const itemId = item.content[item.type].itemId;
           const res = await smtgDoShopTask(item.taskId, itemId);
           console.log(`${item.subTitle}结果${JSON.stringify(res)}`);
@@ -307,7 +312,12 @@ async function businessCircleActivity() {
     if (joinStatus === 0) {
       if (joinPkTeam === 'true') {
         console.log(`\n注：PK会在每天的七点自动随机加入作者创建的队伍\n`)
-        await updatePkActivityIdCDN('https://cdn.jsdelivr.net/gh/gitupdate/updateTeam@master/shareCodes/jd_updateTeam.json');
+        // await updatePkActivityIdCDN('https://cdn.jsdelivr.net/gh/gitupdate/updateTeam@master/shareCodes/jd_updateTeam.json');
+        //格式
+        // {
+        // "pkActivityId": "1614754800000",
+        // "Teams": []
+        // }
         console.log(`\nupdatePkActivityId[pkActivityId]:::${$.updatePkActivityIdRes && $.updatePkActivityIdRes.pkActivityId}`);
         console.log(`\n京东服务器返回的[pkActivityId] ${pkActivityId}`);
         if ($.updatePkActivityIdRes && ($.updatePkActivityIdRes.pkActivityId === pkActivityId)) {
@@ -679,7 +689,7 @@ async function limitTimeProduct() {
           }
           if (shelfList2 && shelfList2.length > 0) {
             const groundRes = await smtg_ground(item2['productId'], shelfList2.slice(-1)[0]);
-            if (groundRes.data.bizCode === 0) {
+            if (groundRes.code === 0) {
               console.log(`限时商品上架成功`);
               message += `【限时商品】上架成功\n`;
             }
