@@ -101,9 +101,30 @@ async function PrizeIndex() {
 
   const prizeList = [...$.queryPrizeData];
   if (prizeList && prizeList.length) {
+
+    //冒泡排序  先看看最多的能不能兑换，按多到少兑换
+    for(var i=0;i<prizeList.length-1;i++){//确定轮数
+      for(var j=0;j<prizeList.length-i-1;j++){//确定每次比较的次数
+        if(prizeList[j].amount<prizeList[j+1].amount){
+          var tem = prizeList[j];
+          prizeList[j] = prizeList[j+1];
+          prizeList[j+1] = tem;
+        }
+      }
+    }
+
     for (const item of prizeList) {
+      //已经兑换过，跳过
+      if(item.finished){
+        continue;
+      }
+
       var amount = item.amount;
-      if(coinToBeans == amount){
+      $.blueCost = item.cost;//花费
+
+      //有足够的豆
+      if ($.totalBlue > $.blueCost) {
+        //能兑换的次数
         var limit = item.limit;
         if(limit){
           for(var i = 0;i<limit;i++){
@@ -116,10 +137,7 @@ async function PrizeIndex() {
                 $.beanerr = `失败，${amount}京豆领光了，请明天再来`;
                 return;
               }
-              if (item.finished) {
-                $.beanerr = `${item.name}`;
-                return;
-              }
+
               //兑换京豆
               if ($.totalBlue > $.blueCost) {
                 await smtg_obtainPrize(item.prizeId);
