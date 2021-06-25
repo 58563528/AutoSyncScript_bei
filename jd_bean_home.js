@@ -80,23 +80,7 @@ const JD_API_HOST = 'https://api.m.jd.com/';
   //       let code = $.newShareCodes[0];
   //       await help(code[0], code[1]);
   //     }
-  //     if (helpAuthor && $.authorCode) {
-  //       console.log(`\n【抢京豆】${$.UserName} 去帮助作者`)
-  //       for (let code of $.authorCode) {
-  //         const helpRes = await help(code.shareCode, code.groupCode);
-  //         if (helpRes && helpRes.data.respCode === 'SG209') {
-  //           break;
-  //         }
-  //       }
-  //     }
-  //     if (helpAuthor && $.authorCode2) {
-  //       for (let code of $.authorCode2) {
-  //         const helpRes = await help(code.shareCode, code.groupCode);
-  //         if (helpRes && helpRes.data.respCode === 'SG209') {
-  //           break;
-  //         }
-  //       }
-  //     }
+  //
   //     for (let j = 1; j < $.newShareCodes.length; j++) {
   //       console.log(`【抢京豆】${$.UserName} 去助力账号 ${j + 1}`)
   //       let code = $.newShareCodes[j];
@@ -171,44 +155,6 @@ function doTask2() {
     })
 }
 
-function getAuthorShareCode() {
-  return new Promise(resolve => {
-    $.get({url: "https://a.nz.lu/bean.json",headers:{
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 Edg/87.0.4280.88"
-      }}, async (err, resp, data) => {
-      try {
-        if (err) {
-        } else {
-          $.authorCode = JSON.parse(data);
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-function getAuthorShareCode2() {
-  return new Promise(resolve => {
-    $.get({url: "https://cdn.jsdelivr.net/gh/gitupdate/updateTeam@master/shareCodes/jd_updateBeanHome.json",headers:{
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 Edg/87.0.4280.88"
-      }}, async (err, resp, data) => {
-      try {
-        if (err) {
-        } else {
-          if (safeGet(data)) {
-            $.authorCode2 = JSON.parse(data);
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
 function getUserInfo() {
   return new Promise(resolve => {
     $.post(taskUrl('signBeanGroupStageIndex', 'body'), async (err, resp, data) => {

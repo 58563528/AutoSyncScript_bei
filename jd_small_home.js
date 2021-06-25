@@ -139,7 +139,6 @@ async function doChannelsListTask(taskId, taskType) {
 }
 async function helpFriends() {
   // await updateInviteCode();
-  // if (!$.inviteCodes) await updateInviteCodeCDN();
   if ($.inviteCodes && $.inviteCodes['inviteCode']) {
     for (let item of $.inviteCodes.inviteCode) {
       if (!item) continue
