@@ -7,7 +7,7 @@ const UA = require('./USER_AGENTS.js').USER_AGENT;
 const URL = 'https://h5.m.jd.com/babelDiy/Zeus/41Lkp7DumXYCFmPYtU3LTcnTTXTX/index.html';
 const REG_SCRIPT = /<script src="([^><]+\/(main\.\w+\.js))\?t=\d+">/gm;
 const REG_ENTRY = /^(.*?\.push\(\[)(\d+,\d+)/;
-const REG_PIN = /pt_pin=(\w+?);/m;
+const REG_PIN = /pt_pin=([^; ]+)(?=;?)/m;
 const KEYWORD_MODULE = 'get_risk_result:';
 const DATA = {appid:'50082',sceneid:'DDhomePageh5'};
 let smashUtils;
@@ -50,7 +50,7 @@ class ZooFakerNecklace {
         const script = REG_SCRIPT.exec(html);
 
         if (script) {
-            const [, scriptUrl, filename] = script;
+            let [, scriptUrl, filename] = script;
             const jsContent = await this.getJSContent(filename, scriptUrl);
             const fnMock = new Function;
             const ctx = {
@@ -74,19 +74,15 @@ class ZooFakerNecklace {
 
             smashUtils = ctx.window.smashUtils;
             smashUtils.init(DATA);
-
-            // console.log(ctx);
         }
 
-        // console.log(html);
-        // console.log(script[1],script[2]);
         console.timeEnd('ZooFakerNecklace');
     }
 
     async getJSContent(cacheKey, url) {
         try {
-            await fs.access(cacheKey, R_OK);
-            const rawFile = await fs.readFile(cacheKey, { encoding: 'utf8' });
+            await fs.access(url, R_OK);
+            const rawFile = await fs.readFile(url, { encoding: 'utf8' });
 
             return rawFile;
         } catch (e) {
@@ -154,7 +150,7 @@ async function getBody($ = {}) {
     const zf = new ZooFakerNecklace($.cookie, $.action);
     const log = await zf.run(riskData);
 
-    return `body=${encodeURIComponent(JSON.stringify(log))}`;
+    return log;
 }
 
 ZooFakerNecklace.getBody = getBody;
