@@ -14,29 +14,12 @@ async function main() {
       console.log(`${$.name}CDN缓存刷新成功`)
     }
   });
-  await updateShareCodes();
   if (!$.body) await scriptsCDN();
   if ($.body) {
     eval($.body);
   }
 }
-function updateShareCodes(url = 'https://raw.githubusercontent.com/yangtingxiao/QuantumultX/master/scripts/jd/jd_rankingList.js') {
-  return new Promise(resolve => {
-    $.get({url}, async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-        } else {
-          $.body = data;
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
+
 function scriptsCDN(url = 'https://raw.fastgit.org/yangtingxiao/QuantumultX/master/scripts/jd/jd_rankingList.js') {
   return new Promise(resolve => {
     $.get({url}, async (err, resp, data) => {
