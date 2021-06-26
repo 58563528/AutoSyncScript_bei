@@ -124,7 +124,7 @@ function userSignIn() {
               signFlag = 0;
               console.log(`${$.name}今日签到成功`);
               if (data.data) {
-                message += `结果${data.data} 🐶\n`;
+                console.log(`结果${data.data} 🐶\n`)
                 // let { alreadySignDays, beanTotalNum, todayPrize, eachDayPrize } = data.data;
                 // message += `【第${alreadySignDays}日签到】成功，获得${todayPrize.beanAmount}京豆 🐶\n`;
                 // if (alreadySignDays === 7) alreadySignDays = 0;
