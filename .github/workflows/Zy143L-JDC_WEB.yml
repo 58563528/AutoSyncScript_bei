@@ -23,6 +23,6 @@ jobs:
         if: env.PAT
         with:
           source_repo: "https://github.com/Zy143L/JDC_WEB.git"
-          source_branch: "main"
+          source_branch: "master"
           destination_branch: "Zy143L-JDC_WEB"
           github_token: ${{ secrets.PAT }}
