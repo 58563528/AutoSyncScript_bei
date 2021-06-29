@@ -66,7 +66,8 @@ $.shareuuid = "6d05c89890d64173b130552eacc30eee" //俺的助力码
             await getMyPin()
             await adlog()
             await getUserInfo()
-            await getUid()
+            await getUid($.myid)
+            await getUid($.myid1)
             if ($.cando) {
                 if($.index < 6){
                     await exchange(cupExid) //兑换
@@ -303,9 +304,9 @@ function getUserInfo() {
     })
 }
 
-function getUid() {
+function getUid(myId) {
     return new Promise(resolve => {
-        let body = `activityId=${$.actid}&pin=${encodeURIComponent($.pin)}&pinImg=${$.pinImg }&nick=${encodeURIComponent($.nick)}&cjyxPin=&cjhyPin=&shareUuid=${$.myid ? $.myid : $.shareuuid}`
+        let body = `activityId=${$.actid}&pin=${encodeURIComponent($.pin)}&pinImg=${$.pinImg }&nick=${encodeURIComponent($.nick)}&cjyxPin=&cjhyPin=&shareUuid=${myId ? myId : $.shareuuid}`
         $.post(taskPostUrl('/dingzhi/hisense/europeancup/activityContent', body), async (err, resp, data) => {
             try {
                 if (err) {
@@ -316,6 +317,10 @@ function getUid() {
                         if ($.index == 1) {
                             $.myid = data.data.uid
                             console.log(`账号1欧洲杯助力码为 ${$.myid}`)
+                        }
+                        if ($.index == 2) {
+                            $.myid1 = data.data.uid
+                            console.log(`账号1欧洲杯助力码为 ${$.myid1}`)
                         }
 
                         $.actid = data.data.activityId
