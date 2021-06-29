@@ -71,8 +71,12 @@ if ($.isNode()) {
       }
       continue
     }
-    await pasture();
-    await $.wait(3000);
+    try {
+      await pasture();
+      await $.wait(3000);
+    }catch (e) {
+      continue
+    }
   }
 
 })()
