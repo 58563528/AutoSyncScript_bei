@@ -31,7 +31,7 @@ if ($.isNode()) {
 const JD_API_HOST = `https://api.m.jd.com/client.action`;
 message = ""
 $.actid = "901100032442101"
-$.shareuuid = "" //俺的助力码
+$.shareuuid = "6d05c89890d64173b130552eacc30eee" //俺的助力码
 !(async () => {
     if (!cookiesArr[0]) {
         $.msg($.name, '【提示】请先获取cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/', {
@@ -64,9 +64,7 @@ $.shareuuid = "" //俺的助力码
             await getActCk()
             await getToken2()
             await getMyPin()
-            if($.index < 6){
-                await adlog()
-            }
+            await adlog()
             await getUserInfo()
             await getUid()
             if ($.cando) {
