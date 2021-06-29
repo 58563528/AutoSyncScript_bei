@@ -64,35 +64,39 @@ $.shareuuid = "" //俺的助力码
             await getActCk()
             await getToken2()
             await getMyPin()
-            await adlog()
+            if($.index < 6){
+                await adlog()
+            }
             await getUserInfo()
             await getUid()
             if ($.cando) {
-                await exchange(cupExid) //兑换
-                await getinfo()
-                taskList = $.taskList
-                for (j = 0; j < taskList.length; j++) {
-                    task = taskList[j]
-                    console.log(task.taskname)
-                    await dotask(task.taskid, task.params)
-                    if (task.taskid == "scanactive") {
-                        for (m = 36; m < 41; m++) {
-                            await dotask(task.taskid, m)
-                        }
-                    } else if (task.taskid == "scansku") {
-                        await getproduct()
-                        for (l = 0; l < $.plist.length; l++) {
-                            console.log("去浏览商品 :" + $.plist[l].venderId)
-                            await writePersonInfo($.plist[l].venderId)
-                            await dotask(task.taskid, $.plist[l].id)
-                        }
-                    } else {
+                if($.index < 6){
+                    await exchange(cupExid) //兑换
+                    await getinfo()
+                    taskList = $.taskList
+                    for (j = 0; j < taskList.length; j++) {
+                        task = taskList[j]
+                        console.log(task.taskname)
                         await dotask(task.taskid, task.params)
-                    }
+                        if (task.taskid == "scanactive") {
+                            for (m = 36; m < 41; m++) {
+                                await dotask(task.taskid, m)
+                            }
+                        } else if (task.taskid == "scansku") {
+                            await getproduct()
+                            for (l = 0; l < $.plist.length; l++) {
+                                console.log("去浏览商品 :" + $.plist[l].venderId)
+                                await writePersonInfo($.plist[l].venderId)
+                                await dotask(task.taskid, $.plist[l].id)
+                            }
+                        } else {
+                            await dotask(task.taskid, task.params)
+                        }
 
+                    }
+                    await exchange(38) //兑换10豆
+                    await getinfo()
                 }
-                await exchange(38) //兑换10豆
-                await getinfo()
 
                 message += `【京东账号${$.index}】${$.nickName || $.UserName}\n${$.cow} \n ${$.exchange}\n`
             } else {
@@ -315,7 +319,7 @@ function getUid() {
                             $.myid = data.data.uid
                             console.log(`账号1欧洲杯助力码为 ${$.myid}`)
                         }
-                        
+
                         $.actid = data.data.activityId
                         /*      $.pinImg = data.data.yunMidImageUrl
                               $.nick = data.data.nickname
