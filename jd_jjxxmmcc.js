@@ -257,27 +257,30 @@ function feed() {
   return new Promise(resolve => {
     $.get(newtasksysUrl('Feed', '', 'channel,sceneid'), async (err, resp, data) => {
       console.log('喂草...', data)
-      data = JSON.parse(data);
-      // console.log(data)
-      if (data) {
-        let newnum = data['data']['newnum'] || data.data.totalcoin;
-        console.log('喂草中...剩余:', newnum)
-        if (data['data']['maintaskId']) {
-          if (data.message === '小鸡吃太多影响健康，明天再喂吧') {
-            console.log('再吃就撑死了！')
-          } else if (data['data']['maintaskId'] === 'pause' && data['ret'] === 2020) {
-            console.log('可收蛋')
-            await getEgg();
-            await $.wait(2000)
-            await feed()
-          }
-        } else {
-          if (newnum >= 10) {
-            await $.wait(2000)
-            await feed();
+      try{
+        data = JSON.parse(data);
+        // console.log(data)
+        if (data) {
+          let newnum = data['data']['newnum'] || data.data.totalcoin;
+          console.log('喂草中...剩余:', newnum)
+          if (data['data']['maintaskId']) {
+            if (data.message === '小鸡吃太多影响健康，明天再喂吧') {
+              console.log('再吃就撑死了！')
+            } else if (data['data']['maintaskId'] === 'pause' && data['ret'] === 2020) {
+              console.log('可收蛋')
+              await getEgg();
+              await $.wait(2000)
+              await feed()
+            }
+          } else {
+            if (newnum >= 10) {
+              await $.wait(2000)
+              await feed();
+            }
           }
         }
-      }
+      }catch(e){}
+      
       resolve()
     })
   })
