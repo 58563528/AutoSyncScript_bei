@@ -336,13 +336,19 @@ function feet() {
   return new Promise(resolve => {
     $.get(newtasksysUrl('Action', '', 'channel,petid,sceneid,type', '1', petid), async (err, resp, data) => {
       console.log(data)
-      data = JSON.parse(data);
-      if (data['ret'] === 0 && data.data.addcoins !== 0) {
-        console.log(`挑逗成功！获得`, data.data.addcoins, `金币。`)
-        feetTotal += data.data.addcoins
-        await $.wait(1000);
-        await feet();
+      try{
+        console.log(data)
+        data = JSON.parse(data);
+        if (data['ret'] === 0 && data.data.addcoins !== 0) {
+          console.log(`挑逗成功！获得`, data.data.addcoins, `金币。`)
+          feetTotal += data.data.addcoins
+          await $.wait(1000);
+          await feet();
+        }
       }
+      catch(e){
+      }
+      
       resolve()
     })
   })
