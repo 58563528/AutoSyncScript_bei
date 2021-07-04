@@ -71,7 +71,7 @@ if ($.isNode()) {
   }
 
   if ($.isNode() && allMessage) {
-    await notify.sendNotify(`${$.name}`, `${allMessage}`)
+    await notify.sendNotify(`${$.name}`, `${allMessage}`, { url: `https://bean.m.jd.com/beanDetail/index.action?resourceValue=bean` })
   }
 })()
     .catch((e) => {
