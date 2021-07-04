@@ -99,7 +99,7 @@ message = ""
 //genToken
 function genToken() {
     let config = {
-        url: 'https://api.m.jd.com/client.action?functionId=genToken&clientVersion=10.0.4&build=88641&client=android&d_brand=Xiaomi&d_model=RedmiK30&osVersion=11&screen=2175*1080&partner=xiaomi001&oaid=b30cf82cacfa8972&openudid=290955c2782e1c44&eid=eidAef5f8122a0sf2tNlFbi9TV+3rtJ+jl5UptrTZo/Aq5MKUEaXcdTZC6RfEBt5Jt3Gtml2hS+ZvrWoDvkVv4HybKpJJVMdRUkzX7rGPOis1TRFRUdU&sdkVersion=30&lang=zh_CN&uuid=290955c2782e1c44&aid=290955c2782e1c44&area=8_573_6627_52446&networkType=wifi&wifiBssid=unknown&uts=0f31TVRjBStpL4ZXG%2Bei9UMZFx11kiAc4uTbRsxZfZtpjK0qBikE0Huau%2BdHMWw7Nxk%2FDA3TwsEF9ZWEw2bHW1pJATTaEazb5s4ufJjOtQ0UlsSdWNOuRR1whnfY5iOVPH0WQifaQw%2BNNHEzMW3vqt8932eMJc8EWhTwcEyYBkI56D6FQeTEhnaG0UEv0qLuGvPMDfUoUM6rra09Khoa3A%3D%3D&uemps=0-0&st=1624142743692&sign=0f1b321eb6b7be6fd1f918c36718b6ee&sv=100',
+        url: 'https://api.m.jd.com/client.action?functionId=genToken&clientVersion=10.0.6&build=167724&client=android&d_brand=Xiaomi&d_model=RedmiK30&osVersion=14.6&screen=2175*1080&partner=xiaomi001&oaid=b30cf82cacfa8972&openudid=753d213009c85f60f8ce9df3a678389ffa3fb1c5&eid=eidAef5f8122a0sf2tNlFbi9TV+3rtJ+jl5UptrTZo/Aq5MKUEaXcdTZC6RfEBt5Jt3Gtml2hS+ZvrWoDvkVv4HybKpJJVMdRUkzX7rGPOis1TRFRUdU&sdkVersion=30&lang=zh_CN&uuid=290955c2782e1c44&aid=290955c2782e1c44&area=8_573_6627_52446&networkType=wifi&wifiBssid=unknown&uts=0f31TVRjBStpL4ZXG%2Bei9UMZFx11kiAc4uTbRsxZfZtpjK0qBikE0Huau%2BdHMWw7Nxk%2FDA3TwsEF9ZWEw2bHW1pJATTaEazb5s4ufJjOtQ0UlsSdWNOuRR1whnfY5iOVPH0WQifaQw%2BNNHEzMW3vqt8932eMJc8EWhTwcEyYBkI56D6FQeTEhnaG0UEv0qLuGvPMDfUoUM6rra09Khoa3A%3D%3D&uemps=0-0&st=1624142743692&sign=0f1b321eb6b7be6fd1f918c36718b6ee&sv=100',
         body: 'body=%7B%22action%22%3A%22to%22%2C%22to%22%3A%22https%253A%252F%252Flzdz-isv.isvjcloud.com%252Fdingzhi%252Fqqxing%252Fpasture%252Factivity%253FactivityId%253D90121061401%22%7D&',
         headers: {
             'Host': 'api.m.jd.com',
@@ -118,6 +118,7 @@ function genToken() {
                     console.log(`${JSON.stringify(err)}`)
                 } else {
                     data = JSON.parse(data);
+                    console.log(data['tokenKey'])
                     $.isvToken = data['tokenKey']
                 }
             } catch (e) {
@@ -152,6 +153,7 @@ function getToken2() {
                 } else {
                     data = JSON.parse(data);
                     $.token2 = data['token']
+                    console.log("token2",$.token2)
                 }
             } catch (e) {
                 $.logErr(e, resp)
@@ -196,7 +198,7 @@ function getActCk() {
 
 //获取我的pin
 function getMyPin() {
-    let config = taskUrl("/customer/getMyPing", `userId=1000361242&token=${$.token2}&fromType=APP`)
+    let config = taskUrl("/customer/getMyPing", `userId=1000361242&token=${encodeURIComponent($.token2)}&fromType=APP`)
     // console.log(config)
     return new Promise(resolve => {
         $.get(config, async (err, resp, data) => {
@@ -225,7 +227,7 @@ function getMyPin() {
 // 获得用户信息  
 function getUserInfo() {
     return new Promise(resolve => {
-        let body = `pin=${encodeURIComponent($.token)}`
+        let body = `pin=${encodeURIComponent($.pin)}`
         $.post(taskPostUrl('wxActionCommon/getUserInfo', body), async (err, resp, data) => {
             try {
                 if (err) {
@@ -250,7 +252,7 @@ function getUserInfo() {
 
 //获取任务列表
 function getinfo() {
-    let config = taskUrl("/dingzhi/qqxing/pasture/myInfo", `activityId=90121061401&pin=${$.pin}&pinImg=${$.pinImg}&nick=${$.nick}&cjyxPin=&cjhyPin=&shareUuid=`)
+    let config = taskUrl("/dingzhi/qqxing/pasture/myInfo", `activityId=90121061401&pin=${encodeURIComponent($.pin)}&pinImg=${$.pinImg}&nick=${$.nick}&cjyxPin=&cjhyPin=&shareUuid=`)
     return new Promise(resolve => {
         $.get(config, async (err, resp, data) => {
             try {
@@ -290,7 +292,7 @@ function getinfo() {
 
 
 function dotask(taskId, params) {
-    let config = taskUrl("/dingzhi/qqxing/pasture/doTask", `taskId=${taskId}&param=${params}&activityId=90121061401&pin=${$.pin}&actorUuid=&userUuid=`)
+    let config = taskUrl("/dingzhi/qqxing/pasture/doTask", `taskId=${taskId}&param=${params}&activityId=90121061401&pin=${encodeURIComponent($.pin)}&actorUuid=&userUuid=`)
     //  console.log(config)
     return new Promise(resolve => {
         $.get(config, async (err, resp, data) => {
