@@ -71,18 +71,17 @@ $.appId = 10028
         HomePageInfo = await GetHomePageInfo();
         cowlastgettime = HomePageInfo.data.cow.lastgettime;
 
-        await bull();
-        await getTaskList();
-
-        let coins = HomePageInfo['data']['coins'];
-        console.log('现有金币:', coins)
-        coins >= 5000 ? await buy() : ""
-
-        let food = HomePageInfo['data']['materialinfo'][0]['value'];
-        console.log('现有草:', food);
-        food >= 10 ? await feed() : ""
-
         if($.index < 7){
+          await bull();
+          await getTaskList();
+
+          let coins = HomePageInfo['data']['coins'];
+          console.log('现有金币:', coins)
+          coins >= 5000 ? await buy() : ""
+
+          let food = HomePageInfo['data']['materialinfo'][0]['value'];
+          console.log('现有草:', food);
+          food >= 10 ? await feed() : ""
           await weed()
           console.log('锄草收货合计:', weedTotal)
 
