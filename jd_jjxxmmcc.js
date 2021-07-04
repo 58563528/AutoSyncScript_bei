@@ -67,27 +67,29 @@ $.appId = 10028
       await requestAlgo();
       await getShareCode();
 
-      HomePageInfo = await GetHomePageInfo();
-      cowlastgettime = HomePageInfo.data.cow.lastgettime;
+      try{
+        HomePageInfo = await GetHomePageInfo();
+        cowlastgettime = HomePageInfo.data.cow.lastgettime;
 
-      await bull();
-      await getTaskList();
+        await bull();
+        await getTaskList();
 
-      let coins = HomePageInfo['data']['coins'];
-      console.log('现有金币:', coins)
-      coins >= 5000 ? await buy() : ""
+        let coins = HomePageInfo['data']['coins'];
+        console.log('现有金币:', coins)
+        coins >= 5000 ? await buy() : ""
 
-      let food = HomePageInfo['data']['materialinfo'][0]['value'];
-      console.log('现有草:', food);
-      food >= 10 ? await feed() : ""
+        let food = HomePageInfo['data']['materialinfo'][0]['value'];
+        console.log('现有草:', food);
+        food >= 10 ? await feed() : ""
 
-      if($.index < 7){
-        await weed()
-        console.log('锄草收货合计:', weedTotal)
+        if($.index < 7){
+          await weed()
+          console.log('锄草收货合计:', weedTotal)
 
-        await feet();
-        console.log('挑逗收货合计:', feetTotal)
-      }
+          await feet();
+          console.log('挑逗收货合计:', feetTotal)
+        }
+      }catch(e){}
       
     }
 
