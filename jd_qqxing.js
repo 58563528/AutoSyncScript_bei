@@ -397,7 +397,7 @@ function getUid() {
                 } else {
                     data = JSON.parse(data);
                         if (data.result) {
-                           console.log(data)
+                           
                            if(data.data.openCardStatus !=3){
                            console.log("当前未开卡,无法助力和兑换奖励哦")
                            }                           
