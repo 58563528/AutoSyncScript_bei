@@ -94,8 +94,8 @@ $.appId = 10028
 
   }
   console.log('开始助力...')
-  for (let i = 0; i < CookieJDs.length; i++) {
-    cookie = CookieJDs[i]
+  for (let i = 0; i < cookiesArr.length; i++) {
+    cookie = cookiesArr[i]
     await help(i)
   }
 })()
