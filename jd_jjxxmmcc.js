@@ -122,11 +122,12 @@ function GetHomePageInfo() {
         'Referer': 'https://st.jingxi.com/',
       }
     }, (err, resp, data) => {
-      data = JSON.parse(data)
-      if(data && data.data && data.data.petinfo[0]){
-        petid = data.data.petinfo[0].petid
-      }
-      
+      try{
+        data = JSON.parse(data)
+        if(data && data.data && data.data.petinfo[0]){
+          petid = data.data.petinfo[0].petid
+        }
+      }catch(e){}
       resolve(data);
     })
   })
