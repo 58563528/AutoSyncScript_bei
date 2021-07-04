@@ -123,7 +123,10 @@ function GetHomePageInfo() {
       }
     }, (err, resp, data) => {
       data = JSON.parse(data)
-      petid = data.data.petinfo[0].petid
+      if(data && data.data && data.data.petinfo[0]){
+        petid = data.data.petinfo[0].petid
+      }
+      
       resolve(data);
     })
   })
