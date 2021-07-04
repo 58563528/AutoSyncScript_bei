@@ -99,12 +99,12 @@ message = ""
 //genToken
 function genToken() {
     let config = {
-        url: 'https://api.m.jd.com/client.action?functionId=genToken&clientVersion=10.0.6&build=167724&client=android&d_brand=Xiaomi&d_model=RedmiK30&osVersion=14.6&screen=2175*1080&partner=xiaomi001&oaid=b30cf82cacfa8972&openudid=753d213009c85f60f8ce9df3a678389ffa3fb1c5&eid=eidAef5f8122a0sf2tNlFbi9TV+3rtJ+jl5UptrTZo/Aq5MKUEaXcdTZC6RfEBt5Jt3Gtml2hS+ZvrWoDvkVv4HybKpJJVMdRUkzX7rGPOis1TRFRUdU&sdkVersion=30&lang=zh_CN&uuid=290955c2782e1c44&aid=290955c2782e1c44&area=8_573_6627_52446&networkType=wifi&wifiBssid=unknown&uts=0f31TVRjBStpL4ZXG%2Bei9UMZFx11kiAc4uTbRsxZfZtpjK0qBikE0Huau%2BdHMWw7Nxk%2FDA3TwsEF9ZWEw2bHW1pJATTaEazb5s4ufJjOtQ0UlsSdWNOuRR1whnfY5iOVPH0WQifaQw%2BNNHEzMW3vqt8932eMJc8EWhTwcEyYBkI56D6FQeTEhnaG0UEv0qLuGvPMDfUoUM6rra09Khoa3A%3D%3D&uemps=0-0&st=1624142743692&sign=0f1b321eb6b7be6fd1f918c36718b6ee&sv=100',
-        body: 'body=%7B%22action%22%3A%22to%22%2C%22to%22%3A%22https%253A%252F%252Flzdz-isv.isvjcloud.com%252Fdingzhi%252Fqqxing%252Fpasture%252Factivity%253FactivityId%253D90121061401%22%7D&',
+        url: 'https://api.m.jd.com/client.action?functionId=genToken',
+        body: '&body=%7B%22to%22%3A%22https%3A%5C/%5C/lzdz-isv.isvjcloud.com%5C/dingzhi%5C/qqxing%5C/pasture%5C/activity?activityId%3D90121061401%22%2C%22action%22%3A%22to%22%7D&build=167588&client=apple&clientVersion=9.4.4&d_brand=apple&d_model=iPhone9%2C2&lang=zh_CN&networkType=wifi&networklibtype=JDNetworkBaseAF&openudid=1805a3ab499eebc088fd9ed1c67f5eaf350856d4&osVersion=12.0&partner=apple&rfs=0000&scope=11&screen=1242%2A2208&sign=73af724a6be5f3cb89bf934dfcde647f&st=1624887881842&sv=111',
         headers: {
             'Host': 'api.m.jd.com',
             'accept': '*/*',
-            'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Mobile/15E148 Safari/604.1',
+            'user-agent': 'JD4iPhone/167490 (iPhone; iOS 14.2; Scale/3.00)',
             'accept-language': 'zh-Hans-JP;q=1, en-JP;q=0.9, zh-Hant-TW;q=0.8, ja-JP;q=0.7, en-US;q=0.6',
             'content-type': 'application/x-www-form-urlencoded',
             'Cookie': cookie
