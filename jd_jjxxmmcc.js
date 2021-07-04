@@ -81,11 +81,14 @@ $.appId = 10028
       console.log('现有草:', food);
       food >= 10 ? await feed() : ""
 
-      await weed()
-      console.log('锄草收货合计:', weedTotal)
+      if($.index < 7){
+        await weed()
+        console.log('锄草收货合计:', weedTotal)
 
-      await feet();
-      console.log('挑逗收货合计:', feetTotal)
+        await feet();
+        console.log('挑逗收货合计:', feetTotal)
+      }
+      
     }
 
   }
