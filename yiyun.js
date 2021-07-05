@@ -239,7 +239,6 @@ async function subscribe(item) {
                             return
                         }else{
                             console.log("日期：" + item.startTime + "，课程：" + item.courseName + "预约失败，原因：" + data.message)
-                            notify.sendNotify(`瑜伽预约提醒`, "日期：" + item.startTime + "，课程：" + item.courseName + "预约失败，原因：" + data.message);
                         }
                     } else {
                         console.log(`服务器返回空数据`)
