@@ -55,10 +55,9 @@ if ($.isNode()) {
                                 console.log("日期：" + schedulesHis.courseDate + "，课程：" + schedulesHis.courseName + "已经预约或取消，跳过循环")
                                 continue
                             }else{
-                                console.log("日期：" + schedulesHis.courseDate + "，课程：" + schedulesHis.courseName + "开始查看课程信息")
                                 await getCoachInfos(schedulesList[i][j]);
                                 //预约课程
-                                console.log("日期：" + schedulesHis.courseDate + "，课程：" + schedulesHis.courseName + "开始预约课程")
+                                console.log("日期：" + schedulesHis.courseDate + "，课程：" + schedulesHis.courseName + ",开始预约课程")
                                 await subscribe(schedulesList[i][j]);
                             }
                         }
