@@ -329,7 +329,6 @@ function WX_Detail_Start(activeId,pin){
                     console.log('\n送豆得豆: API查询请求失败 ‼️‼️')
                     throw new Error(err);
                 } else {
-                    console.log('JSON.parse(data)', JSON.parse(data))
                     // if (data) {
                     //     $.getFriendsData = JSON.parse(data);
                     // } else {
