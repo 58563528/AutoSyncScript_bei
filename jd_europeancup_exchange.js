@@ -7,16 +7,12 @@
 #欧洲狂欢杯
 57 59 9  * * * https://raw.githubusercontent.com/Wenmoux/scripts/wen/jd/jd_europeancup.js, tag=欧洲狂欢杯, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/jd.png, enabled=true
 */
-const $ = new Env('狂欢欧洲杯');
+const $ = new Env('狂欢欧洲杯兑换');
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 cupExid = $.isNode() ? (process.env.Cupexid ? process.env.Cupexid : 38) : ($.getdata("Cupexid") ? $.getdata("Cupexid") : 38);
 
-const randomCount = $.isNode() ? 20 : 5;
 const notify = $.isNode() ? require('./sendNotify') : '';
-let merge = {}
-let codeList = []
-//IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [],
     cookie = '';
 if ($.isNode()) {
@@ -28,90 +24,73 @@ if ($.isNode()) {
     cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
 }
 
-const JD_API_HOST = `https://api.m.jd.com/client.action`;
 message = ""
 $.actid = "901100032442101"
-$.shareuuid = "" //俺的助力码 
-    !(async () => {
-        if (!cookiesArr[0]) {
-            $.msg($.name, '【提示】请先获取cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/', {
-                "open-url": "https://bean.m.jd.com/"
-            });
-            return;
-        }
-        for (let i = 0; i < cookiesArr.length; i++) {
-            cookie = cookiesArr[i];
-            if (cookie) {
-                $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
-                $.index = i + 1;
-                $.cando = true
-                $.cow = ""
-                $.isLogin = true;
-                $.nickName = '';
-                $.drawresult = ""
-                $.exchange = ""
-                console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
-                if (!$.isLogin) {
-                    $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {
-                        "open-url": "https://bean.m.jd.com/bean/signIndex.action"
-                    });
-                    if ($.isNode()) {
-                        await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
-                    }
-                    continue
+$.shareuuid = "" //俺的助力码
+!(async () => {
+    if (!cookiesArr[0]) {
+        $.msg($.name, '【提示】请先获取cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/', {
+            "open-url": "https://bean.m.jd.com/"
+        });
+        return;
+    }
+    for (let i = 0; i < cookiesArr.length; i++) {
+        cookie = cookiesArr[i];
+        if (cookie) {
+            $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
+            $.index = i + 1;
+            $.cando = true
+            $.cow = ""
+            $.isLogin = true;
+            $.nickName = '';
+            $.drawresult = ""
+            $.exchange = ""
+            console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
+            if (!$.isLogin) {
+                $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {
+                    "open-url": "https://bean.m.jd.com/bean/signIndex.action"
+                });
+                if ($.isNode()) {
+                    await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
                 }
-                await genToken()
-                await getActCk()
-                await getToken2()
-                await getMyPin()
-                await adlog()
-                await getUserInfo()
-                await getUid()
-                if ($.cando) {
-                    await getinfo()
-                    taskList = $.taskList
-                    for (j = 0; j < taskList.length; j++) {
-                        task = taskList[j]
-                        console.log(task.taskname)
-                        await dotask(task.taskid, task.params)
-                        if (task.taskid == "scanactive") {
-                            for (m = 36; m < 41; m++) {
-                                await dotask(task.taskid, m)
-                            }
-                        } else if (task.taskid == "scansku") {
-                            await getproduct()
-                            for (l = 0; l < $.plist.length; l++) {
-                                console.log("去浏览商品 :" + $.plist[l].venderId)
-                                await writePersonInfo($.plist[l].venderId)
-                                await dotask(task.taskid, $.plist[l].id)
-                            }
-                        } else {
-                            await dotask(task.taskid, task.params)
-                        }
-
-                    }
-                    await getinfo()
-
-                    message += `【京东账号${$.index}】${$.nickName || $.UserName}\n${$.cow} \n ${$.exchange}\n`
-                } else {
-                    console.log("跑不起来了~请自己进去一次球场")
-                }
+                continue
             }
-        }
+            await genToken()
+            await getActCk()
+            await getToken2()
+            await getMyPin()
+            await adlog()
+            await getUserInfo()
+            await getUid()
+            await getinfo()
+            if ($.cando) {
+                await queryPriceInfo();//查询兑换奖品
 
-        if (message.length != 0) {
-            if ($.isNode()) {
-                await notify.sendNotify("欧洲狂欢杯", `${message}\n 欧洲杯入口：https://lzdz-isv.isvjcloud.com/dingzhi/hisense/europeancup/activity/7431935?activityId=901100032442101&shareUuid=&adsource=null&initHash=/home&shareuserid4minipg=8A+Mf3SBYE8spQtvzQ2VLE7oeVP9kq2pYSH90mYt4m3fwcJlClpxrfmVYaGKuquQkdK3rLBQpEQH9V4tdrrh0w==&shopid=undefined&lng=107.146945&lat=33.255267&sid=cad74d1c843bd47422ae20cadf6fe5aw&un_area=8_573_6627_52446\n\n吹水群：https://t.me/wenmouxx`);
+                if($.eId && $.eCost <= $.curCoin){
+                    await exchange($.eId) //兑换
+                }else if($.jdId && $.jdCost <= $.curCoin){
+                    await exchange($.jdId) //兑换
+                }
+                message += `【京东账号${$.index}】${$.nickName || $.UserName}\n${$.cow} \n ${$.exchange}\n`
             } else {
-                $.msg($.name, "", '欧洲狂欢杯' + message)
+                console.log("跑不起来了~请自己进去一次球场")
             }
         }
-    })()
+    }
+
+    if (message.length != 0) {
+        if ($.isNode()) {
+            await notify.sendNotify("欧洲狂欢杯", `${message}\n 欧洲杯入口：https://lzdz-isv.isvjcloud.com/dingzhi/hisense/europeancup/activity/7431935?activityId=901100032442101&shareUuid=&adsource=null&initHash=/home&shareuserid4minipg=8A+Mf3SBYE8spQtvzQ2VLE7oeVP9kq2pYSH90mYt4m3fwcJlClpxrfmVYaGKuquQkdK3rLBQpEQH9V4tdrrh0w==&shopid=undefined&lng=107.146945&lat=33.255267&sid=cad74d1c843bd47422ae20cadf6fe5aw&un_area=8_573_6627_52446\n\n吹水群：https://t.me/wenmouxx`);
+        } else {
+            $.msg($.name, "", '欧洲狂欢杯' + message)
+        }
+    }
+})()
     .catch((e) => $.logErr(e))
     .finally(() => $.done())
 //获取活动信息
 
-// 更新cookie 
+// 更新cookie
 
 function updateCookie (resp) {
     if (!resp.headers['set-cookie']){
@@ -137,22 +116,6 @@ function updateCookie (resp) {
     for (let key in newObj) {
         key && (cookie = cookie + `${key}=${newObj[key]};`)
     }
-    // console.log(cookie, 'jdCookie')
-}
-
-function jdUrl(functionId, body) {
-  return {
-    url: `https://api.m.jd.com/client.action?functionId=${functionId}`,
-    body: body,
-    headers: {
-      'Host': 'api.m.jd.com',
-      'accept': '*/*',
-      'user-agent': 'JD4iPhone/167490 (iPhone; iOS 14.2; Scale/3.00)',
-      'accept-language': 'zh-Hans-JP;q=1, en-JP;q=0.9, zh-Hant-TW;q=0.8, ja-JP;q=0.7, en-US;q=0.6',
-      'content-type': 'application/x-www-form-urlencoded',
-      'Cookie': cookie
-    }
-  }
 }
 
 //genToken
@@ -212,7 +175,6 @@ function getToken2() {
                 } else {
                     data = JSON.parse(data);
                     $.token2 = data['token']
-                    //     console.log($.token2)
                 }
             } catch (e) {
                 $.logErr(e, resp)
@@ -297,7 +259,6 @@ function getMyPin() {
 
 function adlog() {
     let config = taskUrl("/common/accessLogWithAD", `venderId=1000324421&code=99&pin=${encodeURIComponent($.pin)}&activityId=901100032442101&pageUrl=https%3A%2F%2Flzdz-isv.isvjcloud.com%2Fdingzhi%2Fhisense%2Feuropeancup%2Factivity%2F4871674%3FactivityId%3D901100032442101%26shareUuid%3Db7f58330cb0844b485afacbdea3c7bca%26adsource%3Dnull%26initHash%3D%2Fhome%26shareuserid4minipg%3D8A%252BMf3SBYE8spQtvzQ2VLE7oeVP9kq2pYSH90mYt4m3fwcJlClpxrfmVYaGKuquQkdK3rLBQpEQH9V4tdrrh0w%253D%253D%26shopid%3Dundefined%26lng%3D107.146945%26lat%3D33.255267%26sid%3Dcad74d1c843bd47422ae20cadf6fe5aw%26un_area%3D27_2442_2444_31912%23%2Fhome&subType=app&adSource=null`)
-    //   console.log(config)
     return new Promise(resolve => {
         $.post(config, async (err, resp, data) => {
             try {
@@ -305,7 +266,6 @@ function adlog() {
                     console.log(`${JSON.stringify(err)}`)
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
-                    //  data = JSON.parse(data);
                     if ($.isNode())
                         for (let ck of resp['headers']['set-cookie']) {
                             cookie = `${cookie}; ${ck.split(";")[0]};`
@@ -325,7 +285,7 @@ function adlog() {
     })
 }
 
-// 获得用户信息  
+// 获得用户信息
 function getUserInfo() {
     return new Promise(resolve => {
         let body = `pin=${encodeURIComponent($.pin)}`
@@ -368,9 +328,6 @@ function getUid() {
                             console.log(`账号1欧洲杯助力码为 ${$.shareuuid}`)
                         }
                         $.actid = data.data.activityId
-                        /*      $.pinImg = data.data.yunMidImageUrl
-                              $.nick = data.data.nickname
-                              */
                     } else {
                         $.cando = false
                     }
@@ -399,13 +356,11 @@ function getinfo() {
                     if (data.result) {
                         $.taskList = data.data.task.filter(x => (x.maxNeed == 1 && x.curNum == 0) || (x.taskid == "scansku" && x.curNum != x.maxNeed) || (x.taskid == "scanactive" && x.curNum != x.maxNeed))
                         data = data.data
-                        //        console.log(data.data)
+                        $.curCoin = data.coin
                         $.cow = `当前 足球币：${data.coin}  签到天数：${data.signDay}`
                         console.log($.cow)
-                        //      $.drawchance = $.draw.totalNum - $.draw.useNum
                     } else {
                         $.cando = false
-                        //     console.log(data)
                         console.log(data.errorMessage)
                     }
                 }
@@ -420,72 +375,34 @@ function getinfo() {
 }
 
 
-// 获取浏览商品
-function getproduct() {
+function queryPriceInfo(){
     return new Promise(resolve => {
-        let body = `type=4&activityId=${$.actid}&pin=${encodeURIComponent($.pin)}&actorUuid=${$.uuid}&userUuid=${$.uuid}`
-        $.post(taskUrl('/dingzhi/hisense/europeancup/getproduct', body), async (err, resp, data) => {
+        let body = `activityId=901100032442101&pin=${encodeURIComponent($.pin)}`
+        $.post(taskUrl('/dingzhi/hisense/europeancup/exchangeInfo', body), async (err, resp, data) => {
             try {
                 if (err) {
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
                     data = JSON.parse(data);
-                    // console.log(data)
-                    if (data.data && data.data[0]) {
-                        $.plist = data.data
+                    //   console.log()
 
-                    }
-                }
-            } catch (e) {
-                $.logErr(e, resp)
-            } finally {
-                resolve(data);
-            }
-        })
-    })
-}
-
-// 获取浏览商品
-function writePersonInfo(vid) {
-    return new Promise(resolve => {
-        let body = `jdActivityId=1404370&pin=${encodeURIComponent($.pin)}&actionType=5&venderId=${vid}&activityId=${$.actid}`
-
-        $.post(taskUrl('/interaction/write/writePersonInfo', body), async (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
-                } else {
-                    //    console.log("浏览："+$.vid)
-                    console.log(data)
-                }
-            } catch (e) {
-                $.logErr(e, resp)
-            } finally {
-                resolve(data);
-            }
-        })
-    })
-}
-
-
-
-function dotask(taskId, params) {
-    let config = taskUrl("/dingzhi/hisense/europeancup/doTask", `taskId=${taskId}&${params?("param="+params+"&"):""}activityId=${$.actid}&pin=${encodeURIComponent($.pin)}&actorUuid=${$.uuid}&userUuid=${$.shareuuid}`)
-    //     console.log(config)
-    return new Promise(resolve => {
-        $.get(config, async (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`${JSON.stringify(err)}`)
-                    console.log(`${$.name} API请求失败，请检查网路重试`)
-                } else {
-                    data = JSON.parse(data);
-                    if (data.result) {
-                        if (data.data.food) {
-                            console.log("操作成功,获得足球币： " + data.data.coin)
-                        }
+                    if (data.data.data && data.data.data.exchangeList) {
+                        var exchangeList = data.data.data.exchangeList
+                        exchangeList.forEach((item,index) => {
+                            var name = item.name
+                            var id = item.id
+                            var price = item.price
+                            //e卡
+                            if(name.indexOf("e卡") != -1){
+                                $.eId = id;
+                                $.eCost = price;
+                            }else if(name.indexOf("京豆") != -1){
+                                $.jdId = id;
+                                $.jdCost = price;
+                            }
+                        })
                     } else {
-                        console.log(data.errorMessage)
+                        console.log(JSON.stringify(data.data))
                     }
                 }
             } catch (e) {
@@ -495,19 +412,37 @@ function dotask(taskId, params) {
             }
         })
     })
-
 }
 
 
 
-
-
-
-
+//兑换商品
+function exchange(id) {
+    return new Promise(resolve => {
+        let body = `activityId=901100032442101&pin=${encodeURIComponent($.pin)}&id=${id}`
+        $.post(taskUrl('/dingzhi/hisense/europeancup/exchange', body), async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    data = JSON.parse(data);
+                    if (data.result && data.data.result) {
+                        console.log(`兑换 ${data.data.data.rewardName}成功`)
+                        $.exchange += `兑换 ${data.data.data.rewardName}成功`
+                    } else {
+                        console.log(JSON.stringify(data.data))
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve(data);
+            }
+        })
+    })
+}
 
 function taskUrl(url, body) {
-    const time = Date.now();
-    //  console.log(cookie)
     return {
         url: `https://lzdz-isv.isvjcloud.com${url}?${body}`,
         headers: {
@@ -531,7 +466,7 @@ function taskPostUrl(url, body) {
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
             'Referer': `https://lzdz-isv.isvjcloud.com/dingzhi/hisense/europeancup/activity/7431935?activityId=901100032442101&shareUuid=b7f58330cb0844b485afacbdea3c7bca&adsource=null&initHash=/home&shareuserid4minipg=8A%2BMf3SBYE8spQtvzQ2VLE7oeVP9kq2pYSH90mYt4m3fwcJlClpxrfmVYaGKuquQkdK3rLBQpEQH9V4tdrrh0w%3D%3D&shopid=undefined&lng=107.146945&lat=33.255267&sid=cad74d1c843bd47422ae20cadf6fe5aw&un_area=8_573_6627_52446`,
-                'user-agent': 'jdapp;android;10.0.4;11;2393039353533623-7383235613364343;network/wifi;model/Redmi K30;addressid/138549750;aid/290955c2782e1c44;oaid/b30cf82cacfa8972;osVer/30;appBuild/88641;partner/xiaomi001;eufv/1;jdSupportDarkMode/0;Mozilla/5.0 (Linux; Android 11; Redmi K30 Build/RKQ1.200826.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045537 Mobile Safari/537.36',
+            'user-agent': 'jdapp;android;10.0.4;11;2393039353533623-7383235613364343;network/wifi;model/Redmi K30;addressid/138549750;aid/290955c2782e1c44;oaid/b30cf82cacfa8972;osVer/30;appBuild/88641;partner/xiaomi001;eufv/1;jdSupportDarkMode/0;Mozilla/5.0 (Linux; Android 11; Redmi K30 Build/RKQ1.200826.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045537 Mobile Safari/537.36',
             'content-type': 'application/x-www-form-urlencoded',
             'Cookie': `${cookie} IsvToken=${$.IsvToken};`,
         }
