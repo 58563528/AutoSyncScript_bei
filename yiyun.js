@@ -56,9 +56,6 @@ if ($.isNode()) {
                                 continue
                             }else{
                                 await getCoachInfos(schedulesList[i][j]);
-                                //预约课程
-                                console.log("日期：" + schedulesHis.courseDate + "，课程：" + schedulesHis.courseName + ",开始预约课程")
-                                await subscribe(schedulesList[i][j]);
                             }
                         }
 
@@ -121,6 +118,8 @@ async function getCourCanHistory(page) {
                                 for(var i = 0;i < items.length;i++){
                                     schedulesHisList.push(items[i])
                                 }
+                            }else{
+                                isContinue = false
                             }
                             return
                         }
@@ -177,6 +176,8 @@ async function getCourHistory(page) {
                                 for(var i = 0;i < items.length;i++){
                                     schedulesHisList.push(items[i])
                                 }
+                            }else{
+                                isContinue = false
                             }
                             return
                         }
@@ -294,6 +295,10 @@ async function getCoachInfos(item) {
                             item.startTime = schedule.startTime
                             item.endTime = schedule.endTime
                             item.scheduleId = schedule.scheduleId
+
+                            //预约课程 异步
+                            console.log("日期：" + item.startTime + "，课程：" + item.courseName + ",开始预约课程")
+                            subscribe(item)
                             return
                         }
                     } else {
