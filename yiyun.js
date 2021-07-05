@@ -73,7 +73,7 @@ if ($.isNode()) {
         console.log("未登录")
         notify.sendNotify(`瑜伽预约提醒`, "CK失效");
     }
-    
+
 })()
     .catch((e) => {
         $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
@@ -384,7 +384,7 @@ async function getBaseInfo() {
                 } else {
                     if (data) {
                         data = JSON.parse(data);
-                        if (data['userName']) {
+                        if (data['userName'] && data['userName'] != "") {
                             console.log('当前账号：' + data['userName']);
                             var mainnavis = data['mainnavis']
                             if(mainnavis){
