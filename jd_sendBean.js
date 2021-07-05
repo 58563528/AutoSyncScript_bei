@@ -21,10 +21,6 @@ if ($.isNode()) {
 } else {
     cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
 }
-let message = '', subTitle = '';
-
-let jdNotify = false;//是否开启静默运行，false关闭静默运行(即通知)，true打开静默运行(即不通知)
-
 
 !(async () => {
     if (!cookiesArr[0]) {
@@ -49,7 +45,6 @@ let jdNotify = false;//是否开启静默运行，false关闭静默运行(即通
                 continue
             }
 
-            //帮助前两个账号
             if($.index < 3){
                 $.helpPin.push($.UserName)
             }
@@ -64,7 +59,6 @@ let jdNotify = false;//是否开启静默运行，false关闭静默运行(即通
             $.nickName = '';
 
             await sendBean();
-            await showMsg();
         }
     }
 })()
@@ -344,28 +338,6 @@ function WX_Detail_Start(activeId,pin){
     })
 }
 
-function showMsg() {
-    return new Promise(resolve => {
-        $.stealFood = $.stealFood >= 0 ? `【偷好友狗粮】获取${$.stealFood}g狗粮\n` : `【偷好友狗粮】${$.stealFood}\n`;
-        $.stealFriendCoin = $.stealFriendCoin >= 0 ? `【领取好友积分】获得${$.stealFriendCoin}个\n` : `【领取好友积分】${$.stealFriendCoin}\n`;
-        $.helpFood = $.helpFood >= 0 ? `【给好友喂食】消耗${$.helpFood}g狗粮,获得积分${$.helpFood}个\n` : `【给好友喂食】${$.helpFood}\n`;
-        message += $.stealFriendCoin;
-        message += $.stealFood;
-        message += $.helpFood;
-        let flag;
-        if ($.getdata('jdJoyStealNotify')) {
-            flag = `${$.getdata('jdJoyStealNotify')}` === 'false';
-        } else {
-            flag = `${jdNotify}` === 'false';
-        }
-        if (flag) {
-            $.msg($.name, '', message);
-        } else {
-            $.log(`\n${message}\n`);
-        }
-        resolve()
-    })
-}
 function updateCookie (resp) {
     if (!resp || !resp.headers['set-cookie']){
         return
@@ -435,40 +407,6 @@ function TotalBean() {
             }
         })
     })
-}
-function taskUrl(functionId, friendPin) {
-    let opt = {
-        url: `//jdjoy.jd.com/common/pet/${functionId}?friendPin=${encodeURI(friendPin)}&reqSource=h5&invokeKey=Oex5GmEuqGep1WLC`,
-        // url: `//draw.jdfcloud.com/common/pet/getPetTaskConfig?reqSource=h5`,
-        method: "GET",
-        data: {},
-        credentials: "include",
-        header: {"content-type": "application/json"}
-    }
-    const url = "https:"+ taroRequest(opt)['url']
-    return {
-        url,
-        headers: {
-            'Cookie': cookie,
-            'reqSource': 'h5',
-            'Host': 'jdjoy.jd.com',
-            'Connection': 'keep-alive',
-            'Content-Type': 'application/json',
-            'Referer': 'https://jdjoy.jd.com/pet/index',
-            'User-Agent': $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
-            'Accept-Language': 'zh-cn',
-            'Accept-Encoding': 'gzip, deflate, br',
-        }
-    }
-}
-function timeFormat(time) {
-    let date;
-    if (time) {
-        date = new Date(time)
-    } else {
-        date = new Date();
-    }
-    return date.getFullYear() + '-' + ((date.getMonth() + 1) >= 10 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + (date.getDate() >= 10 ? date.getDate() : '0' + date.getDate());
 }
 function jsonParse(str) {
     if (typeof str == "string") {
