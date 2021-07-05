@@ -9,7 +9,7 @@
 const $ = new Env('依云约课');
 const notify = $.isNode() ? require('./sendNotify') : '';
 
-let cookie = '',mainnaviId = '',schedulesList = [];
+let cookie = '',mainnaviId = '',schedulesList = [],isContinue=true,schedulesHisList = [];
 if ($.isNode()) {
     if (process.env.YI_YUN_CK){
         cookie = process.env.YI_YUN_CK
@@ -23,14 +23,45 @@ if ($.isNode()) {
     await getBaseInfo();
     //获取所有课程
     await getAllClass();
+
+    //预约历史，最多10页
+    for(var i = 0;i < 10 ;i++){
+        if(!isContinue){
+            break
+        }
+        await getCourHistory(i + 1);
+    }
+    isContinue = true
+    //取消历史，最多10页
+    for(var i = 0;i < 10 ;i++){
+        if(!isContinue){
+            break
+        }
+        await getCourCanHistory(i + 1);
+    }
+
     //获取课程信息
     if(schedulesList){
         for(var i = 0;i < schedulesList.length;i++){
             for(var j = 0;j < schedulesList[i].length;j++){
                 if(schedulesList[i][j] && schedulesList[i][j].scheduleId){
-                    await getCoachInfos(schedulesList[i][j]);
-                    //预约课程
-                    await subscribe(schedulesList[i][j]);
+                    //已预约或已取消的跳过
+                    for(var k = 0;k < schedulesHisList.length;k++){
+                        var schedulesHis = schedulesHisList[k]
+                        if(schedulesList[i][j].startTime == schedulesHis.courseDate
+                            && schedulesHis.courseName == schedulesList[i][j].courseName
+                            && schedulesHis.roomName == schedulesList[i][j].roomName){
+                            console.log("日期：" + schedulesHis.courseDate + "，课程：" + schedulesHis.courseName + "已经预约或取消，跳过循环")
+                            continue
+                        }else{
+                            console.log("日期：" + schedulesHis.courseDate + "，课程：" + schedulesHis.courseName + "开始查看课程信息")
+                            await getCoachInfos(schedulesList[i][j]);
+                            //预约课程
+                            console.log("日期：" + schedulesHis.courseDate + "，课程：" + schedulesHis.courseName + "开始预约课程")
+                            await subscribe(schedulesList[i][j]);
+                        }
+                    }
+
                 }else{
                     console.log(schedulesList[i][j].courseName + "无课程id")
                 }
@@ -44,6 +75,119 @@ if ($.isNode()) {
     .finally(() => {
         $.done();
     })
+
+async function getCourCanHistory(page) {
+    return new Promise(async resolve => {
+        var body = {
+            "startTime" : null,
+            "currPage" : page,
+            "endTime" : null,
+            "listType" : 1,
+            "pageSize" : 100
+        }
+        const options = {
+            "url": `https://mapp.easy-hi.com/m/api/yg/customer/SubscribeController/getMySubscriptions`,
+            'body': `${JSON.stringify(body)}`,
+            "headers": {
+                "Host":"mapp.easy-hi.com",
+                "Origin":"https://mapp.easy-hi.com",
+                "Accept": "application/json,text/plain, */*",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Accept-Language": "zh-cn",
+                "Connection": "keep-alive",
+                "Cookie": cookie,
+                "Content-Type":"application/json;charset=utf-8",
+                "Referer": "https://mapp.easy-hi.com/m/2106739369/cust",
+                "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
+            }
+        }
+        $.post(options, (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    if (data) {
+                        data = JSON.parse(data);
+                        if (data && data.code == 0) {
+                            data = data.data
+                            var items = data.items
+                            if(items && items.length > 0){
+                                for(var i = 0;i < items.length;i++){
+                                    schedulesHisList.push(items[i])
+                                }
+                            }
+                            return
+                        }
+                    } else {
+                        console.log(`服务器返回空数据`)
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
+async function getCourHistory(page) {
+    return new Promise(async resolve => {
+        var body = {
+            "startTime" : null,
+            "currPage" : page,
+            "endTime" : null,
+            "listType" : 1,
+            "pageSize" : 100
+        }
+        const options = {
+            "url": `https://mapp.easy-hi.com/m/api/yg/customer/SubscribeController/getMySubscriptions`,
+            'body': `${JSON.stringify(body)}`,
+            "headers": {
+                "Host":"mapp.easy-hi.com",
+                "Origin":"https://mapp.easy-hi.com",
+                "Accept": "application/json,text/plain, */*",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Accept-Language": "zh-cn",
+                "Connection": "keep-alive",
+                "Cookie": cookie,
+                "Content-Type":"application/json;charset=utf-8",
+                "Referer": "https://mapp.easy-hi.com/m/2106739369/cust",
+                "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
+            }
+        }
+        $.post(options, (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    if (data) {
+                        data = JSON.parse(data);
+                        if (data && data.code == 0) {
+                            data = data.data
+                            var items = data.items
+                            if(items && items.length > 0){
+                                for(var i = 0;i < items.length;i++){
+                                    schedulesHisList.push(items[i])
+                                }
+                            }
+                            return
+                        }
+                    } else {
+                        console.log(`服务器返回空数据`)
+                    }
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
+
 async function subscribe(item) {
     return new Promise(async resolve => {
         var body = {
