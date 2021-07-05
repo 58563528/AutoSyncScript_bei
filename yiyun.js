@@ -21,53 +21,59 @@ if ($.isNode()) {
 !(async () => {
     //获取基本信息
     await getBaseInfo();
-    //获取所有课程
-    await getAllClass();
+    if($.isLogin){
+        //获取所有课程
+        await getAllClass();
 
-    //预约历史，最多10页
-    for(var i = 0;i < 10 ;i++){
-        if(!isContinue){
-            break
+        //预约历史，最多10页
+        for(var i = 0;i < 10 ;i++){
+            if(!isContinue){
+                break
+            }
+            await getCourHistory(i + 1);
         }
-        await getCourHistory(i + 1);
-    }
-    isContinue = true
-    //取消历史，最多10页
-    for(var i = 0;i < 10 ;i++){
-        if(!isContinue){
-            break
+        isContinue = true
+        //取消历史，最多10页
+        for(var i = 0;i < 10 ;i++){
+            if(!isContinue){
+                break
+            }
+            await getCourCanHistory(i + 1);
         }
-        await getCourCanHistory(i + 1);
-    }
 
-    //获取课程信息
-    if(schedulesList){
-        for(var i = 0;i < schedulesList.length;i++){
-            for(var j = 0;j < schedulesList[i].length;j++){
-                if(schedulesList[i][j] && schedulesList[i][j].scheduleId){
-                    //已预约或已取消的跳过
-                    for(var k = 0;k < schedulesHisList.length;k++){
-                        var schedulesHis = schedulesHisList[k]
-                        if(schedulesList[i][j].startTime == schedulesHis.courseDate
-                            && schedulesHis.courseName == schedulesList[i][j].courseName
-                            && schedulesHis.roomName == schedulesList[i][j].roomName){
-                            console.log("日期：" + schedulesHis.courseDate + "，课程：" + schedulesHis.courseName + "已经预约或取消，跳过循环")
-                            continue
-                        }else{
-                            console.log("日期：" + schedulesHis.courseDate + "，课程：" + schedulesHis.courseName + "开始查看课程信息")
-                            await getCoachInfos(schedulesList[i][j]);
-                            //预约课程
-                            console.log("日期：" + schedulesHis.courseDate + "，课程：" + schedulesHis.courseName + "开始预约课程")
-                            await subscribe(schedulesList[i][j]);
+        //获取课程信息
+        if(schedulesList){
+            for(var i = 0;i < schedulesList.length;i++){
+                for(var j = 0;j < schedulesList[i].length;j++){
+                    if(schedulesList[i][j] && schedulesList[i][j].scheduleId){
+                        //已预约或已取消的跳过
+                        for(var k = 0;k < schedulesHisList.length;k++){
+                            var schedulesHis = schedulesHisList[k]
+                            if(schedulesList[i][j].startTime == schedulesHis.courseDate
+                                && schedulesHis.courseName == schedulesList[i][j].courseName
+                                && schedulesHis.roomName == schedulesList[i][j].roomName){
+                                console.log("日期：" + schedulesHis.courseDate + "，课程：" + schedulesHis.courseName + "已经预约或取消，跳过循环")
+                                continue
+                            }else{
+                                console.log("日期：" + schedulesHis.courseDate + "，课程：" + schedulesHis.courseName + "开始查看课程信息")
+                                await getCoachInfos(schedulesList[i][j]);
+                                //预约课程
+                                console.log("日期：" + schedulesHis.courseDate + "，课程：" + schedulesHis.courseName + "开始预约课程")
+                                await subscribe(schedulesList[i][j]);
+                            }
                         }
-                    }
 
-                }else{
-                    console.log(schedulesList[i][j].courseName + "无课程id")
+                    }else{
+                        console.log(schedulesList[i][j].courseName + "无课程id")
+                    }
                 }
             }
         }
+    }else{
+        console.log("未登录")
+        notify.sendNotify(`瑜伽预约提醒`, "CK失效");
     }
+    
 })()
     .catch((e) => {
         $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
