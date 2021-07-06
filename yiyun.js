@@ -9,7 +9,7 @@
 const $ = new Env('依云约课');
 const notify = $.isNode() ? require('./sendNotify') : '';
 
-let cookie = '',mainnaviId = '',schedulesList = [],isContinue=true,schedulesHisList = [];
+let cookie = '',mainnaviId = '',schedulesList = [],isContinue=true,isContinueHis=true,isContinueCanHis=true,schedulesHisList = [];
 if ($.isNode()) {
     if (process.env.YI_YUN_CK){
         cookie = process.env.YI_YUN_CK
@@ -25,38 +25,66 @@ if ($.isNode()) {
         //获取所有课程
         await getAllClass();
 
+        //从昨天开始统计
+        var dateStart = new Date()
+        dateStart.setDate(dateStart.getDate() - 1)
+        dateStart = dateStart.format("yyyy-MM-dd")
+
+        var dateEnd = new Date()
+        dateEnd.setDate(dateEnd.getDate() + 10)
+        dateEnd = dateEnd.format("yyyy-MM-dd")
+
         //预约历史，最多10页
+        isContinueHis=true
+        console.log(`开始查询，从昨日开始，已预约或排队订单`)
         for(var i = 0;i < 10 ;i++){
-            if(!isContinue){
+            if(!isContinueHis){
                 break
             }
-            await getCourHistory(i + 1);
+            await getCourHistory(i + 1,dateStart,dateEnd);
         }
-        isContinue = true
+        console.log(`从昨日开始，已预约或排队订单数：` + schedulesHisList.length)
+
+        var len = schedulesHisList.length
+        console.log(`开始查询，从昨日开始，历史订单`)
+        isContinueCanHis = true
         //取消历史，最多10页
         for(var i = 0;i < 10 ;i++){
-            if(!isContinue){
+            if(!isContinueCanHis){
                 break
             }
-            await getCourCanHistory(i + 1);
+            await getCourCanHistory(i + 1,dateStart,dateEnd);
         }
+        console.log(`从昨日开始，历史订单数：` + (schedulesHisList.length - len))
 
         //获取课程信息
         if(schedulesList){
             for(var i = 0;i < schedulesList.length;i++){
                 for(var j = 0;j < schedulesList[i].length;j++){
                     if(schedulesList[i][j] && schedulesList[i][j].scheduleId){
-                        //已预约或已取消的跳过
+                        var schedu = schedulesList[i][j]
+
+                        var isContain = false;
                         for(var k = 0;k < schedulesHisList.length;k++){
                             var schedulesHis = schedulesHisList[k]
-                            if(schedulesList[i][j].startTime == schedulesHis.courseDate
-                                && schedulesHis.courseName == schedulesList[i][j].courseName
-                                && schedulesHis.roomName == schedulesList[i][j].roomName){
-                                console.log("日期：" + schedulesHis.courseDate + "，课程：" + schedulesHis.courseName + "已经预约或取消，跳过循环")
-                                continue
-                            }else{
-                                await getCoachInfos(schedulesList[i][j]);
+                            if(schedu.startTime == schedulesHis.courseDate
+                                && schedulesHis.courseName == schedu.courseName
+                                && schedulesHis.roomName == schedu.roomName){
+                                isContain = true
+                                break
                             }
+                        }
+
+                        if(isContain){
+                            console.log("日期：" + schedu.startTime + "，课程：" + schedu.courseName + "已经预约或取消，跳过循环")
+                            continue
+                        }else{
+                            //displayState有数据，应该是没到开放时间
+                            if(schedu.displayState){
+                                console.log("日期：" + schedu.startTime + "，课程：" + schedu.courseName + "未到预约时间，跳过")
+                                continue
+                            }
+                            await getCoachInfos(schedu);
                         }
 
                     }else{
@@ -78,14 +106,14 @@ if ($.isNode()) {
         $.done();
     })
 
-async function getCourCanHistory(page) {
+async function getCourCanHistory(page,dateStart,dateEnd) {
     return new Promise(async resolve => {
         var body = {
-            "startTime" : null,
+            "startTime" : dateStart,
             "currPage" : page,
-            "endTime" : null,
-            "listType" : 1,
-            "pageSize" : 100
+            "endTime" : dateEnd,
+            "listType" : 0,
+            "pageSize" : 10
         }
         const options = {
             "url": `https://mapp.easy-hi.com/m/api/yg/customer/SubscribeController/getMySubscriptions`,
@@ -118,8 +146,12 @@ async function getCourCanHistory(page) {
                                 for(var i = 0;i < items.length;i++){
                                     schedulesHisList.push(items[i])
                                 }
+                                //小于页数，无需继续查询
+                                if(items.length < 10){
+                                    isContinueCanHis = false
+                                }
                             }else{
-                                isContinue = false
+                                isContinueCanHis = false
                             }
                             return
                         }
@@ -136,14 +168,14 @@ async function getCourCanHistory(page) {
     })
 }
 
-async function getCourHistory(page) {
+async function getCourHistory(page,dateStart,dateEnd) {
     return new Promise(async resolve => {
         var body = {
-            "startTime" : null,
+            "startTime" : dateStart,
             "currPage" : page,
-            "endTime" : null,
+            "endTime" : dateEnd,
             "listType" : 1,
-            "pageSize" : 100
+            "pageSize" : 10
         }
         const options = {
             "url": `https://mapp.easy-hi.com/m/api/yg/customer/SubscribeController/getMySubscriptions`,
@@ -176,8 +208,12 @@ async function getCourHistory(page) {
                                 for(var i = 0;i < items.length;i++){
                                     schedulesHisList.push(items[i])
                                 }
+                                //小于页数，无需继续查询
+                                if(items.length < 10){
+                                    isContinueHis = false
+                                }
                             }else{
-                                isContinue = false
+                                isContinueHis = false
                             }
                             return
                         }
@@ -194,7 +230,7 @@ async function getCourHistory(page) {
     })
 }
 
-async function subscribe(item) {
+async function subscribe(item,type) {
     return new Promise(async resolve => {
         var body = {
             "discountValue" : item.discountValue,
@@ -210,6 +246,14 @@ async function subscribe(item) {
             "startTime" : item.startTime,
             "agree" : false
         }
+
+        var url = 'https://mapp.easy-hi.com/m/api/yg/customer/SubscribeController/confirmQueue'
+        if("CONFIRM" == type){
+            url = 'https://mapp.easy-hi.com/m/api/yg/customer/SubscribeController/confirmSubscribe'
+        }else if("QUEUE" == type){
+            url = 'https://mapp.easy-hi.com/m/api/yg/customer/SubscribeController/confirmQueue'
+        }
+
         const options = {
             "url": `https://mapp.easy-hi.com/m/api/yg/customer/SubscribeController/confirmQueue`,
             'body': `${JSON.stringify(body)}`,
@@ -260,6 +304,7 @@ async function getCoachInfos(item) {
             "scheduleId" : item.scheduleId,
             "duration" : null
         }
+
         const options = {
             "url": `https://mapp.easy-hi.com/m/api/yg/customer/SubscribeController/index`,
             'body': `${JSON.stringify(body)}`,
@@ -297,8 +342,14 @@ async function getCoachInfos(item) {
                             item.scheduleId = schedule.scheduleId
 
                             //预约课程 异步
-                            console.log("日期：" + item.startTime + "，课程：" + item.courseName + ",开始预约课程")
-                            subscribe(item)
+                            //预定人数达到最大，排队 否则直接预定
+                            if(item.subscribeMaxNum <= item.subscribeNum){
+                                console.log("日期：" + item.startTime + "，课程：" + item.courseName + ",开始排队")
+                                subscribe(item,"QUEUE")
+                            }else{
+                                console.log("日期：" + item.startTime + "，课程：" + item.courseName + ",开始预约")
+                                subscribe(item,"CONFIRM")
+                            }
                             return
                         }
                     } else {
@@ -413,6 +464,27 @@ async function getBaseInfo() {
             }
         })
     })
+}
+
+Date.prototype.format = function (fmt) {
+    var o = {
+        "M+": this.getMonth() + 1, //月份
+        "d+": this.getDate(), //日
+        "h+": this.getHours(), //小时
+        "m+": this.getMinutes(), //分
+        "s+": this.getSeconds(), //秒
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+        "S": this.getMilliseconds() //毫秒
+    };
+    if (/(y+)/.test(fmt)) {
+        fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    }
+    for (var k in o) {
+        if (new RegExp("(" + k + ")").test(fmt)) {
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        }
+    }
+    return fmt;
 }
 
 // prettier-ignore
