@@ -19,6 +19,7 @@ if ($.isNode()) {
 }
 
 !(async () => {
+    var start = new Date();
     //获取基本信息
     await getBaseInfo();
     if($.isLogin){
@@ -97,6 +98,8 @@ if ($.isNode()) {
         console.log("未登录")
         notify.sendNotify(`瑜伽预约提醒`, "CK失效");
     }
+    var end = new Date();
+    console.log("本次执行耗时：" + (end.getTime() - start.getTime())/1000 + "秒")
 
 })()
     .catch((e) => {
