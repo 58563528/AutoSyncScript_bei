@@ -72,19 +72,15 @@ codeList = []
                     }
 
                 }
-
-                if(codeList[0]){
-                    console.log(`为 ${codeList[0]}助力中`)
-                    await getinfo(1,167,codeList[0])
-                }
-                if(codeList[1]){
-                    console.log(`为 ${codeList[1]}助力中`)
-                    await getinfo(1,167,codeList[1])
-                }
             }
         }
     }
-
+    for (let i = 0; i < cookiesArr.length ;  i++) {
+        for(let j = 0;j < codeList.length;j++){
+            console.log(`为 ${codeList[j]}助力中`)
+            await getinfo(1,167,codeList[j])
+        }
+    }
 
 
 })()
@@ -212,7 +208,7 @@ function getReward(type, id) {
 
 function getinfo(inviteType="2",id="",invitePin) {
     return new Promise(async (resolve) => {
-        let options = taskPostUrl("joyBaseInfo", `{"taskId":"${id}","inviteType":"${inviteType}","inviterPin":"${invitePin?invitePin:$.invitePin}","linkId":"${$.linkid}"}`)
+        let options = taskPostUrl("joyBaseInfo", `{"taskId":"${id}","inviteType":"${inviteType}","inviterPin":"${invitePin?invitePin:''}","linkId":"${$.linkid}"}`)
         $.post(options, async (err, resp, data) => {
             try {
                 if (err) {
@@ -228,8 +224,15 @@ function getinfo(inviteType="2",id="",invitePin) {
                             console.log(`账号${$.index} 助力码 ${info.invitePin}`)
                         }
                         if($.index ==1 || $.index ==2){
-                            $.invitePin = info.invitePin
-                            codeList.push(info.invitePin)
+                            if(codeList && codeList.length > 0){
+                                codeList.forEach((item) => {
+                                    if(item != info.invitePin){
+                                        codeList.push(info.invitePin)
+                                    }
+                                })
+                            }else{
+                                codeList.push(info.invitePin)
+                            }
                         }
                         if(inviteType ==1) {
                             console.log(`助力结果：${info.helpState}`)
