@@ -66,8 +66,17 @@ $.shareuuid = "" //俺的助力码
             if ($.cando) {
                 await queryPriceInfo();//查询兑换奖品
 
-                if($.eId && $.eCost <= $.curCoin){
-                    await exchange($.eId) //兑换
+                //还没兑换爱奇艺
+                if(!$.iqiyiRec){
+                    if($.iqiyiId && $.iqiyiCost <= $.curCoin){
+                        await exchange($.iqiyiId) //兑换
+                    }
+                }
+                //还没兑换e卡
+                if(!$.eRec){
+                    if($.eId && $.eCost <= $.curCoin){
+                        await exchange($.eId) //兑换
+                    }
                 }else if($.jdId && $.jdCost <= $.curCoin){
                     await exchange($.jdId) //兑换
                 }
@@ -399,6 +408,22 @@ function queryPriceInfo(){
                             }else if(name.indexOf("京豆") != -1){
                                 $.jdId = id;
                                 $.jdCost = price;
+                            }else if(name.indexOf("爱奇艺") != -1){
+                                $.iqiyiId = id;
+                                $.iqiyiCost = price;
+                            }
+                        })
+                        var mRecordList = data.data.data.mRecordList
+                        mRecordList.forEach((item,index) => {
+                            var name = item.name
+                            //e卡
+                            if(name.indexOf("e卡") != -1){
+                                $.eRec = true;
+                            }else if(name.indexOf("爱奇艺") != -1){
+                                $.iqiyiRec = true;
+                            }else{
+                                $.eRec = false;
+                                $.iqiyiRec = false;
                             }
                         })
                     } else {
