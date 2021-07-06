@@ -10,8 +10,6 @@
 const $ = new Env('狂欢欧洲杯兑换');
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-cupExid = $.isNode() ? (process.env.Cupexid ? process.env.Cupexid : 38) : ($.getdata("Cupexid") ? $.getdata("Cupexid") : 38);
-
 const notify = $.isNode() ? require('./sendNotify') : '';
 let cookiesArr = [],
     cookie = '';
@@ -99,33 +97,6 @@ $.shareuuid = "" //俺的助力码
     .finally(() => $.done())
 //获取活动信息
 
-// 更新cookie
-
-function updateCookie (resp) {
-    if (!resp.headers['set-cookie']){
-        return
-    }
-    let obj = {}
-    let cookieobj = {}
-    let cookietemp = cookie.split(';')
-    for (let v of cookietemp) {
-        const tt2 = v.split('=')
-        obj[tt2[0]] = v.replace(tt2[0] + '=', '')
-    }
-    for (let ck of resp['headers']['set-cookie']) {
-        const tt = ck.split(";")[0]
-        const tt2 = tt.split('=')
-        obj[tt2[0]] = tt.replace(tt2[0] + '=', '')
-    }
-    const newObj = {
-        ...cookieobj,
-        ...obj,
-    }
-    cookie = ''
-    for (let key in newObj) {
-        key && (cookie = cookie + `${key}=${newObj[key]};`)
-    }
-}
 
 //genToken
 function genToken() {
