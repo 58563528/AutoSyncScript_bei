@@ -106,33 +106,6 @@ async function jdBeauty() {
   await showMsg();
 }
 
-function updateCookie (resp) {
-    if (!resp.headers['set-cookie']){
-        return
-    }
-    let obj = {}
-    let cookieobj = {}
-    let cookietemp = cookie.split(';')
-    for (let v of cookietemp) {
-        const tt2 = v.split('=')
-        obj[tt2[0]] = v.replace(tt2[0] + '=', '')
-    }
-    for (let ck of resp['headers']['set-cookie']) {
-        const tt = ck.split(";")[0]
-        const tt2 = tt.split('=')
-        obj[tt2[0]] = tt.replace(tt2[0] + '=', '')
-    }
-    const newObj = {
-        ...cookieobj,
-        ...obj,
-    }
-    cookie = ''
-    for (let key in newObj) {
-        key && (cookie = cookie + `${key}=${newObj[key]};`)
-    }
-    // console.log(cookie, 'jdCookie')
-}
-
 async function helpFriends() {
   for (let code of $.newShareCodes) {
     if (!code) continue
@@ -147,7 +120,6 @@ function getIsvToken() {
   return new Promise(resolve => {
     let body = 'body=%7B%22to%22%3A%22https%3A%5C%2F%5C%2Flzdz-isv.isvjcloud.com%5C%2Fdingzhi%5C%2Fbook%5C%2Fdevelop%5C%2Factivity%3FactivityId%3Ddz2010100034444201%22%2C%22action%22%3A%22to%22%7D&build=167490&client=apple&clientVersion=9.3.2&openudid=53f4d9c70c1c81f1c8769d2fe2fef0190a3f60d2&sign=f3eb9660e798c20372734baf63ab55f2&st=1610267023622&sv=111'
     $.post(jdUrl('genToken', body), async (err, resp, data) => {
-      updateCookie(resp)
       try {
         if (err) {
           console.log(`${$.name} API请求失败，请检查网路重试`)
@@ -171,7 +143,6 @@ function getIsvToken2() {
   return new Promise(resolve => {
     let body = 'body=%7B%22url%22%3A%22https%3A%5C%2F%5C%2Flzdz-isv.isvjcloud.com%22%2C%22id%22%3A%22%22%7D&build=167490&client=apple&clientVersion=9.3.2&openudid=53f4d9c70c1c81f1c8769d2fe2fef0190a3f60d2&sign=6050f8b81f4ba562b357e49762a8f4b0&st=1610267024346&sv=121'
     $.post(jdUrl('isvObfuscator', body), async (err, resp, data) => {
-      updateCookie(resp)
       try {
         if (err) {
           console.log(`${$.name} API请求失败，请检查网路重试`)
@@ -194,7 +165,6 @@ function getIsvToken2() {
 function getActCk() {
   return new Promise(resolve => {
     $.get(taskUrl("dingzhi/book/develop/activity", `activityId=${ACT_ID}`), (err, resp, data) => {
-      updateCookie(resp)
       try {
         if (err) {
           console.log(`${$.name} API请求失败，请检查网路重试`)
@@ -222,7 +192,6 @@ function getActCk() {
 function getActInfo() {
   return new Promise(resolve => {
     $.post(taskPostUrl('dz/common/getSimpleActInfoVo', `activityId=${ACT_ID}`), async (err, resp, data) => {
-      updateCookie(resp)
       try {
         if (err) {
           console.log(`${$.name} API请求失败，请检查网路重试`)
@@ -248,7 +217,6 @@ function getToken() {
   return new Promise(resolve => {
     let body = `userId=${$.shopId}&token=${$.token2}&fromType=APP`
     $.post(taskPostUrl('customer/getMyPing', body), async (err, resp, data) => {
-      updateCookie(resp)
       try {
         if (err) {
           console.log(`${$.name} API请求失败，请检查网路重试`)
@@ -272,7 +240,6 @@ function getUserInfo() {
   return new Promise(resolve => {
     let body = `pin=${encodeURIComponent($.token)}`
     $.post(taskPostUrl('wxActionCommon/getUserInfo', body), async (err, resp, data) => {
-      updateCookie(resp)
       try {
         if (err) {
           console.log(`${$.name} API请求失败，请检查网路重试`)
@@ -329,11 +296,11 @@ function getActContent(info = false, shareUuid = '') {
   return new Promise(resolve => {
     let body = `activityId=${ACT_ID}&pin=${encodeURIComponent($.token)}&pinImg=${$.pinImg}&nick=${$.nick}&cjyxPin=&cjhyPin=&shareUuid=${shareUuid}`
     $.post(taskPostUrl('dingzhi/book/develop/activityContent', body), async (err, resp, data) => {
-      updateCookie(resp)
       try {
         if (err) {
           console.log(`${$.name} API请求失败，请检查网路重试`)
         } else {
+          //     console.log(data)
           if (data && safeGet(data)) {
             data = JSON.parse(data);
             if (data.data) {
@@ -400,7 +367,6 @@ function doHelpList(taskType, value) {
   let body = `activityId=${ACT_ID}&actorUuid=${$.actorUuid}&num=0&sortStatus=1`
   return new Promise(resolve => {
     $.post(taskPostUrl('dingzhi/taskact/common/getDayShareRecord', body), async (err, resp, data) => {
-      updateCookie(resp)
       try {
         if (err) {
           console.log(`${$.name} API请求失败，请检查网路重试`)
@@ -424,7 +390,6 @@ function doTask(taskType, value) {
   let body = `activityId=${ACT_ID}&pin=${encodeURIComponent($.token)}&actorUuid=${$.actorUuid}&taskType=${taskType}&taskValue=${value}`
   return new Promise(resolve => {
     $.post(taskPostUrl('dingzhi/book/develop/saveTask', body), async (err, resp, data) => {
-      updateCookie(resp)
       try {
         if (err) {
           console.log(`${$.name} API请求失败，请检查网路重试`)
@@ -454,7 +419,6 @@ function draw() {
   let body = `activityId=${ACT_ID}&pin=${encodeURIComponent($.token)}&actorUuid=${$.actorUuid}`
   return new Promise(resolve => {
     $.post(taskPostUrl('dingzhi/book/develop/startDraw', body), async (err, resp, data) => {
-      updateCookie(resp)
       try {
         if (err) {
           console.log(`${$.name} API请求失败，请检查网路重试`)
@@ -486,7 +450,6 @@ function getAllBook() {
   let body = `activityId=${ACT_ID}&actorUuid=${$.actorUuid}&pin=${encodeURIComponent($.token)}`
   return new Promise(resolve => {
     $.post(taskPostUrl('dingzhi/book/develop/getAllBook', body), async (err, resp, data) => {
-      updateCookie(resp)
       try {
         if (err) {
           console.log(`${$.name} API请求失败，请检查网路重试`)
@@ -518,7 +481,6 @@ function buyBook(bookUuid, num) {
   let body = `activityId=${ACT_ID}&actorUuid=${$.actorUuid}&pin=${encodeURIComponent($.token)}&bookUuid=${bookUuid}&buyNum=${num}`
   return new Promise(resolve => {
     $.post(taskPostUrl('dingzhi/book/develop/buyBook', body), async (err, resp, data) => {
-      updateCookie(resp)
       try {
         if (err) {
           console.log(`${$.name} API请求失败，请检查网路重试`)
@@ -543,7 +505,6 @@ function getMyBook() {
   let body = `activityId=${ACT_ID}&actorUuid=${$.actorUuid}&pin=${encodeURIComponent($.token)}&type1=1&type2=1&type3=1&type=1`
   return new Promise(resolve => {
     $.post(taskPostUrl('dingzhi/book/develop/getMyBook', body), async (err, resp, data) => {
-      updateCookie(resp)
       try {
         if (err) {
           console.log(`${$.name} API请求失败，请检查网路重试`)
@@ -573,7 +534,6 @@ function upBook(bookUuid) {
   let body = `activityId=${ACT_ID}&actorUuid=${$.actorUuid}&pin=${encodeURIComponent($.token)}&bookUuid=${bookUuid}&isPutOn=1&position=1`
   return new Promise(resolve => {
     $.post(taskPostUrl('dingzhi/book/develop/upBook', body), async (err, resp, data) => {
-      updateCookie(resp)
       try {
         if (err) {
           console.log(`${$.name} API请求失败，请检查网路重试`)
@@ -600,7 +560,6 @@ function chargeGold() {
   let body = `activityId=${ACT_ID}&actorUuid=${$.actorUuid}&pin=${encodeURIComponent($.token)}`
   return new Promise(resolve => {
     $.post(taskPostUrl('dingzhi/book/develop/chargeGold', body), async (err, resp, data) => {
-      updateCookie(resp)
       try {
         if (err) {
           console.log(`${$.name} API请求失败，请检查网路重试`)
