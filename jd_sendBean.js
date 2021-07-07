@@ -121,7 +121,7 @@ async function getActivityInfo(){
         return ;
     }
     for (let i = 0; i < $.activityList.length; i++) {
-        if($.activityList[i].status !== 'NOT_BEGIN'){
+        if(!($.activityList[i].status == 'NOT_BEGIN' || $.activityList[i].status == 'FINISH')){
             $.activityId = $.activityList[i].activeId;
             break;
         }
