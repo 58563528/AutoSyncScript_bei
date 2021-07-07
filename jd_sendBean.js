@@ -276,7 +276,7 @@ function getAllActives(){
                             items.forEach((item,index) => {
                                 var beginTime = item.beginTime
                                 //活动中的
-                                if(beginTime < new Date().getTime()){
+                                if(beginTime < new Date().getTime() && "FINISH" != item.status){
                                     $.taskList.push(item)
                                 }
 
