@@ -48,6 +48,7 @@ if ($.isNode()) {
         console.log(`获取活动ID失败`);
         return ;
     }
+    $.openTuanList = [];
     console.log(`前2个账号开始开团\n`);
     for (let i = 0; i < cookiesArr.length && i < 2; i++) {
         $.cookie = cookiesArr[i];
