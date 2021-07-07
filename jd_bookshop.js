@@ -316,7 +316,7 @@ function getActContent(info = false, shareUuid = '') {
                 $.shareUuid = $.userInfo.actorUuid
               }
               // if(!info) console.log(`您的好友助力码为${$.actorUuid}`)
-              if(!info) console.log(`\n【京东账号${$.index}（${$.UserName}）的${$.name}好友互助码】${$.actorUuid}\n`);
+              if(!info) console.log(`\n【京东账号${$.index}（${$.UserName}）的${$.name}好友互助码】${$.userInfo.actorUuid}\n`);
               $.gold = $.userInfo.bookStore.hasStoreGold
               if (!info) {
                 const tasks = data.data.settingVo
