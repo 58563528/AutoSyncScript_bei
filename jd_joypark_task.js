@@ -46,7 +46,7 @@ message = ""
 
             await getJoyBaseInfo()
 
-            if($.index < 7){
+            if($.index < 3){
                 if ($.joyBaseInfo && $.joyBaseInfo.invitePin) {
                     $.log(`${$.name} - ${$.UserName}  助力码: ${$.joyBaseInfo.invitePin}`);
                     $.invitePinTaskList.push($.joyBaseInfo.invitePin);
