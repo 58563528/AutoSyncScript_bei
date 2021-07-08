@@ -74,9 +74,8 @@ if ($.isNode()) {
     }
     console.log('\n开团信息\n'+JSON.stringify($.openTuanList));
     console.log(`\n开始互助\n`);
-    let ckList = getRandomArrayElements(cookiesArr,cookiesArr.length);
-    for (let i = 0; i < ckList.length && $.openTuanList.length > 0; i++) {
-        $.cookie = ckList[i];
+    for (let i = 0; i < cookiesArr.length && $.openTuanList.length > 0; i++) {
+        $.cookie = cookiesArr[i];
         $.UserName = decodeURIComponent($.cookie.match(/pt_pin=(.+?);/) && $.cookie.match(/pt_pin=(.+?);/)[1])
         $.index = i + 1;
         $.isLogin = true;
