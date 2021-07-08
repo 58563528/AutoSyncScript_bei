@@ -100,14 +100,19 @@ $.needhelp2 = true
                 for (k = 0; k < $.drawchance; k++) {
                     await draw()
                 }
-                let exchanges =Math.floor($.foodNum/1000)
-                console.log(`可兑换 ${exchanges} 次 20京🐶`)
+                let exchanges =Math.floor($.foodNum/3000)
+                console.log(`可兑换 ${exchanges} 次 50京🐶`)
                 for(q = 0;q<exchanges && Exchange;q++){
-                    await exchange(13)
+                    await exchange(14)    //16是100豆
                 }
                 await getinfo()
                 if(!Exchange){console.log("你 默认 不兑换东西,请自行进去活动兑换")}
                 message += `【京东账号${$.index}】${$.nickName || $.UserName}\n${$.cow} 兑换京🐶 ${$.exchange}  ${$.drawresult}\n`
+                if($.index%3===0)
+                {
+                    await $.wait(60*1000)
+                    console.log("休息休息~")
+                }
             } else {
                 $.msg($.name, "", "跑不起来了~请自己进去一次牧场")
             }
@@ -261,15 +266,22 @@ function getMyPin() {
                     console.log(`${JSON.stringify(err)}`)
                     console.log(`${$.name} API请求失败，请检查网路重试`)
                 } else {
+                    if ($.isNode())
+                        for (let ck of resp['headers']['set-cookie']) {
+                            cookie = `${cookie}; ${ck.split(";")[0]};`
+                        }
+                    else {
+                        for (let ck of resp['headers']['Set-Cookie'].split(',')) {
+                            cookie = `${cookie}; ${ck.split(";")[0]};`
+                        }
+                    }
                     data = JSON.parse(data);
                     if (data.data && data.data.secretPin) {
                         $.pin = data.data.secretPin
                         //    console.log($.pin)
                         $.nickname = data.data.nickname
-                        $.lz_jdpin_token = resp['headers']['set-cookie'].filter(row => row.indexOf("lz_jdpin_token") !== -1)[0]
                         // console.log(data)
                         console.log(`欢迎回来~  ${$.nickname}`);
-                        console.log("lz_jdpin_token=" +$.lz_jdpin_token)
                     }
                 }
             } catch (e) {
@@ -592,7 +604,7 @@ function taskPostUrl(url, body) {
             'Referer': 'https://lzdz-isv.isvjcloud.com/dingzhi/qqxing/pasture/activity/6318274?activityId=90121061401&shareUuid=1d9c89a5290a42ebb23c8d5662cc799b&adsource=null&shareuserid4minipg=Ej42XlmwUZpSlF8TzjHBW2Sy3WQlSnqzfk0%2FaZMj9YjTmBx5mleHyWG1kOiKkz%2Fk&shopid=undefined&lng=107.146945&lat=33.255267&sid=cad74d1c843bd47422ae20cadf6fe5aw&un_area=8_573_6627_52446',
             'user-agent': 'jdapp;android;10.0.4;11;2393039353533623-7383235613364343;network/wifi;model/Redmi K30;addressid/138549750;aid/290955c2782e1c44;oaid/b30cf82cacfa8972;osVer/30;appBuild/88641;partner/xiaomi001;eufv/1;jdSupportDarkMode/0;Mozilla/5.0 (Linux; Android 11; Redmi K30 Build/RKQ1.200826.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045537 Mobile Safari/537.36',
             'content-type': 'application/x-www-form-urlencoded',
-            'Cookie': `${cookie} IsvToken=${$.IsvToken};AUTH_C_USER=${$.pin};${$.lz_jdpin_token}`,
+            'Cookie': `${cookie} IsvToken=${$.IsvToken};AUTH_C_USER=${$.pin};`,
         }
     }
 }
