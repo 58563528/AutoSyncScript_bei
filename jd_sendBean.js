@@ -118,11 +118,12 @@ if ($.isNode()) {
 async function getActivityInfo(){
     $.activityList = [];
     await getActivityList();
+    await getActivityList1();
     if($.activityList.length === 0){
         return ;
     }
     for (let i = 0; i < $.activityList.length; i++) {
-        if(!($.activityList[i].status == 'NOT_BEGIN' || $.activityList[i].status == 'FINISH')){
+        if(!($.activityList[i].status == 'NOT_BEGIN' || $.activityList[i].status == 'FINISH' || $.activityList[i].status == 'COMPLETE')){
             $.activityId = $.activityList[i].activeId;
             break;
         }
@@ -138,6 +139,43 @@ async function getActivityInfo(){
     }
     $.completeNumbers = $.detail.activityInfo.completeNumbers;
     console.log(`获取到的活动ID：${$.activityId},需要邀请${$.completeNumbers}人瓜分`);
+}
+
+async function getActivityList1(){
+    return new Promise((resolve) => {
+        let options = {
+            "url": `https://draw.jdfcloud.com//api/lottery/home/v2?openId=oPcgJ48NkJw3kCeK-BLdDxtahaI8&unionid=oCwKwuHDM-WoQOM7zsW1XLD5Jx9M&appId=wxccb5c536b0ecd1bf`,
+            "headers": {
+                "Host": "draw.jdfcloud.com",
+                "Cookie": $.cookie,
+                "Connection": "keep-alive",
+                "Accept": "application/json, text/plain, */*",
+                "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
+                "Accept-Language": "zh-cn",
+                "Referer": "https://servicewechat.com/wxccb5c536b0ecd1bf/733/page-frame.html",
+                "Accept-Encoding": "gzip, deflate, br",
+                "OpenId": "oPcgJ48NkJw3kCeK-BLdDxtahaI8",
+                "App-Id": "wxccb5c536b0ecd1bf",
+                "Lottery-Access-Signature": "wxccb5c536b0ecd1bf1537237540544h79HlfU",
+                "LKYLToken": "96f9a29a51eb6383287d27e6f7f09cd4"
+            }
+        };
+        $.get(options, (err, resp, data) => {
+            try {
+                data = JSON.parse(data);
+                if(data.success){
+                    var items = data.data.beanActivityEntry.items;
+                    $.activityList.push(...items)
+                }else{
+                    console.log(JSON.stringify(data));
+                }
+            } catch (e) {
+                console.log(e);
+            } finally {
+                resolve(data);
+            }
+        })
+    });
 }
 
 async function getActivityList(){
