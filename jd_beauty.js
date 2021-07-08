@@ -70,12 +70,12 @@ const JD_API_HOST = 'https://api.m.jd.com/client.action';
     }
   }
 })()
-  .catch((e) => {
-    $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
-  })
-  .finally(() => {
-    $.done();
-  })
+    .catch((e) => {
+      $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
+    })
+    .finally(() => {
+      $.done();
+    })
 
 async function accountCheck() {
   $.hasDone = false;
@@ -466,13 +466,13 @@ async function mr() {
             console.log(`收取产品失败，错误信息${vo.msg}`)
           }
           break
-        // case "get_task":
-        //   console.log(`当前任务【${vo.data.describe}】，需要【${vo.data.product.name}】${vo.data.package_stock}/${vo.data.num}份`)
-        //   if (vo.data.package_stock >= vo.data.num) {
-        //     console.log(`满足任务要求，去完成任务`)
-        //     client.send(`{"msg":{"type":"action","args":{"task_id":${vo.data.id}},"action":"complete_task"}}`)
-        //   }
-        //   break
+          // case "get_task":
+          //   console.log(`当前任务【${vo.data.describe}】，需要【${vo.data.product.name}】${vo.data.package_stock}/${vo.data.num}份`)
+          //   if (vo.data.package_stock >= vo.data.num) {
+          //     console.log(`满足任务要求，去完成任务`)
+          //     client.send(`{"msg":{"type":"action","args":{"task_id":${vo.data.id}},"action":"complete_task"}}`)
+          //   }
+          //   break
         case 'get_benefit':
           for (let benefit of vo.data) {
             if (benefit.type === 1) { //type 1 是京豆

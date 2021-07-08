@@ -318,7 +318,7 @@ async function dealReturn(type, res) {
             if (data.code === 0) {
                 console.log(`互助码：${data.data.result && data.data.result.inviteId || '助力已满，获取助力码失败'}`);
                 if (data.data.result && data.data.result.inviteId) {
-                    if($.index < 7){
+                    if($.index < 6){
                         $.inviteList.push({
                             'ues': $.UserName,
                             // 'secretp': $.secretp,
@@ -334,7 +334,7 @@ async function dealReturn(type, res) {
             if (data.code === 0) {
                 console.log(`SH互助码：${data.data.result && data.data.result.inviteId || '助力已满，获取助力码失败'}`);
                 if (data.data.result && data.data.result.inviteId) {
-                    if (data.data.result.inviteId && $.index < 7) $.ShInviteList.push(data.data.result.inviteId);
+                    if (data.data.result.inviteId && $.index < 6) $.ShInviteList.push(data.data.result.inviteId);
                     console.log(`守护金额：${Number(data.data.result.activityLeftAmount || 0)} 护盾剩余：${timeFn(Number(data.data.result.guardLeftSeconds || 0)*1000)} 离结束剩：${timeFn(Number(data.data.result.activityLeftSeconds || 0)*1000)}`)
                 }
                 $.taskList = data.data.result && data.data.result.taskVos || [];
