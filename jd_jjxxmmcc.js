@@ -71,23 +71,21 @@ $.appId = 10028
         HomePageInfo = await GetHomePageInfo();
         cowlastgettime = HomePageInfo.data.cow.lastgettime;
 
-        if($.index < 7){
-          await bull();
-          await getTaskList();
+        await bull();
+        await getTaskList();
 
-          let coins = HomePageInfo['data']['coins'];
-          console.log('现有金币:', coins)
-          coins >= 5000 ? await buy() : ""
+        let coins = HomePageInfo['data']['coins'];
+        console.log('现有金币:', coins)
+        coins >= 5000 ? await buy() : ""
 
-          let food = HomePageInfo['data']['materialinfo'][0]['value'];
-          console.log('现有草:', food);
-          food >= 10 ? await feed() : ""
-          await weed()
-          console.log('锄草收货合计:', weedTotal)
+        let food = HomePageInfo['data']['materialinfo'][0]['value'];
+        console.log('现有草:', food);
+        food >= 10 ? await feed() : ""
+        await weed()
+        console.log('锄草收货合计:', weedTotal)
 
-          await feet();
-          console.log('挑逗收货合计:', feetTotal)
-        }
+        await feet();
+        console.log('挑逗收货合计:', feetTotal)
       }catch(e){}
       
     }
@@ -375,7 +373,7 @@ function getShareCode() {
     }, (err, resp, data) => {
       try {
         data = JSON.parse(data)
-        if($.index < 3){
+        if($.index < 6){
           console.log('助力码：', data.data.sharekey)
           shareCodes.push(data.data.sharekey)
         }
