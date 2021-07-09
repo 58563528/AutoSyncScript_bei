@@ -103,7 +103,7 @@ $.needhelp2 = true
                 let exchanges =Math.floor($.foodNum/3000)
                 console.log(`可兑换 ${exchanges} 次 50京🐶`)
                 for(q = 0;q<exchanges && Exchange;q++){
-                    await exchange(14)    //16是100豆
+                    await exchange(16)    //16是100豆
                 }
                 await getinfo()
                 if(!Exchange){console.log("你 默认 不兑换东西,请自行进去活动兑换")}
