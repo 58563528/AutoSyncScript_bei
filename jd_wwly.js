@@ -521,17 +521,10 @@ function getinfo(inviteType="2",id="",invitePin) {
                             console.log(joyinfo)
                             console.log(`账号${$.index} 助力码 ${info.invitePin}`)
                         }
-                        if($.index ==1 || $.index ==2){
-                            if(codeList && codeList.length > 0){
-                                codeList.forEach((item) => {
-                                    if(item != info.invitePin){
-                                        codeList.push(info.invitePin)
-                                    }
-                                })
-                            }else{
-                                codeList.push(info.invitePin)
-                            }
+                        if($.index ==1){
+                            $.invitePin = info.invitePin
                         }
+                        codeList[codeList.length]  =   info.invitePin
                         if(inviteType ==1) {
                             console.log(`助力结果：${info.helpState}`)
                             resolve(info.helpState)
