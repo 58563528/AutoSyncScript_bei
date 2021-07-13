@@ -91,19 +91,20 @@ function api(fn: string, stk: string, params: Params = {}) {
 }
 
 function makeShareCodes() {
-    return new Promise<void>(async resolve => {
-        let {data} = await axios.post('https://api.m.jd.com/client.action?functionId=initForFarm', `body=${escape(JSON.stringify({"version": 4}))}&appid=wh5&clientVersion=9.1.0`, {
-            headers: {
-                "cookie": cookie,
-                "origin": "https://home.m.jd.com",
-                "referer": "https://home.m.jd.com/myJd/newhome.action",
-                "User-Agent": USER_AGENT,
-                "Content-Type": "application/x-www-form-urlencoded"
-            }
-        })
-        let farm: string = data.farmUserPro.shareCode
-        res = await api('user/QueryUserInfo', '_cfd_t,bizCode,ddwTaskId,dwEnv,ptag,source,strShareId,strZone', {ddwTaskId: '', strShareId: '', strMarkList: 'undefined'})
-        if(index < 6){
+    if(index < 6){
+        return new Promise<void>(async resolve => {
+            let {data} = await axios.post('https://api.m.jd.com/client.action?functionId=initForFarm', `body=${escape(JSON.stringify({"version": 4}))}&appid=wh5&clientVersion=9.1.0`, {
+                headers: {
+                    "cookie": cookie,
+                    "origin": "https://home.m.jd.com",
+                    "referer": "https://home.m.jd.com/myJd/newhome.action",
+                    "User-Agent": USER_AGENT,
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
+            })
+            let farm: string = data.farmUserPro.shareCode
+            res = await api('user/QueryUserInfo', '_cfd_t,bizCode,ddwTaskId,dwEnv,ptag,source,strShareId,strZone', {ddwTaskId: '', strShareId: '', strMarkList: 'undefined'})
+
             console.log('助力码:', res.strMyShareId)
             shareCodes.push(res.strMyShareId)
 
@@ -118,8 +119,9 @@ function makeShareCodes() {
                 .catch(e => {
                     console.log(e)
                 })
-        }
-    })
+
+        })
+    }
 }
 
 async function requestAlgo() {
