@@ -2,9 +2,6 @@
  * 京喜财富岛
  * 包含雇佣导游，建议每小时1次
  *
- * 此版本暂定默认帮助HelloWorld，帮助助力池
- * export CFD_HELP_HW = true    // 帮助HelloWorld
- * export CFD_HELP_POOL = true  // 帮助助力池
  *
  * 使用jd_env_copy.js同步js环境变量到ts
  * 使用jd_ts_test.ts测试环境变量
@@ -20,11 +17,6 @@ const CryptoJS = require('crypto-js')
 dotenv.config()
 let appId: number = 10028, fingerprint: string | number, token: string, enCryptMethodJD: any;
 let cookie: string = '', cookiesArr: Array<string> = [], res: any = '', shareCodes: string[] = [];
-let CFD_HELP_HW: string = process.env.CFD_HELP_HW ? process.env.CFD_HELP_HW : "true";
-console.log('帮助HelloWorld:', CFD_HELP_HW)
-let CFD_HELP_POOL: string = process.env.CFD_HELP_POOL ? process.env.CFD_HELP_POOL : "true";
-console.log('帮助助力池:', CFD_HELP_POOL)
-
 
 let UserName: string, index: number, isLogin: boolean, nickName: string
 !(async () => {
@@ -121,12 +113,6 @@ let UserName: string, index: number, isLogin: boolean, nickName: string
     }
   }
 
-  // 获取随机助力码
-  if (CFD_HELP_HW === 'true') {
-    shareCodes = [
-      ...shareCodes,
-    ]
-  }
   for (let i = 0; i < cookiesArr.length; i++) {
     for (let j = 0; j < shareCodes.length; j++) {
       cookie = cookiesArr[i]
@@ -221,19 +207,22 @@ function makeShareCodes() {
     })
     let farm: string = data.farmUserPro.shareCode
     res = await api('user/QueryUserInfo', '_cfd_t,bizCode,ddwTaskId,dwEnv,ptag,source,strShareId,strZone', {ddwTaskId: '', strShareId: '', strMarkList: 'undefined'})
-    console.log('助力码:', res.strMyShareId)
-    shareCodes.push(res.strMyShareId)
-    axios.get(`https://api.sharecode.ga/api/jxcfd/insert?code=${res.strMyShareId}&farm=${farm}`)
-      .then(res => {
-        if (res.data.code === 200)
-          console.log('已自动提交助力码')
-        else
-          console.log('提交失败！已提交farm的cookie才可提交cfd')
-        resolve()
-      })
-      .catch(e => {
-        console.log(e)
-      })
+    if(index < 6){
+      console.log('助力码:', res.strMyShareId)
+      shareCodes.push(res.strMyShareId)
+
+      axios.get(`https://api.sharecode.ga/api/jxcfd/insert?code=${res.strMyShareId}&farm=${farm}`)
+          .then(res => {
+            if (res.data.code === 200)
+              console.log('已自动提交助力码')
+            else
+              console.log('提交失败！已提交farm的cookie才可提交cfd')
+            resolve()
+          })
+          .catch(e => {
+            console.log(e)
+          })
+    }
   })
 }
 
