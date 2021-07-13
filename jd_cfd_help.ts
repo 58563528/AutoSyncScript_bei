@@ -108,18 +108,6 @@ function makeShareCodes() {
             console.log('助力码:', res.strMyShareId)
             shareCodes.push(res.strMyShareId)
 
-            axios.get(`https://api.sharecode.ga/api/jxcfd/insert?code=${res.strMyShareId}&farm=${farm}`)
-                .then(res => {
-                    if (res.data.code === 200)
-                        console.log('已自动提交助力码')
-                    else
-                        console.log('提交失败！已提交farm的cookie才可提交cfd')
-                    resolve()
-                })
-                .catch(e => {
-                    console.log(e)
-                })
-
         })
     }
 }
