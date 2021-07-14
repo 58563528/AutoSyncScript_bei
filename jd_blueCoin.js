@@ -71,19 +71,9 @@ const JD_API_HOST = `https://api.m.jd.com/api?appid=jdsupermarket`;
         }
         continue
       }
-      //先兑换京豆
-      if ($.isNode()) {
-        if (process.env.MARKET_COIN_TO_BEANS) {
-          coinToBeans = process.env.MARKET_COIN_TO_BEANS;
-        }
-      }
       try {
-        if (`${coinToBeans}` !== '0') {
-          await smtgHome();//查询蓝币数量，是否满足兑换的条件
-          await PrizeIndex();
-        } else {
-          console.log('查询到您设置的是不兑换京豆选项，现在为您跳过兑换京豆。如需兑换，请去BoxJs设置或者修改脚本coinToBeans或设置环境变量MARKET_COIN_TO_BEANS\n')
-        }
+        await smtgHome();//查询蓝币数量，是否满足兑换的条件
+        await PrizeIndex();
         await msgShow();
       } catch (e) {
         $.logErr(e)
@@ -322,7 +312,7 @@ function smtg_obtainPrize(prizeId, timeout = 0, functionId = 'smt_exchangePrize'
 }
 function smtgHome() {
   return new Promise((resolve) => {
-    $.get(taskUrl('smtg_home'), (err, resp, data) => {
+    $.get(taskUrl('smtg_newHome',{"channel":"18"}), (err, resp, data) => {
       try {
         if (err) {
           console.log('\n东东超市兑换奖品: API查询请求失败 ‼️‼️')
@@ -332,9 +322,7 @@ function smtgHome() {
             data = JSON.parse(data);
             if (data.data.bizCode === 0) {
               const { result } = data.data;
-              $.totalGold = result.totalGold;
               $.totalBlue = result.totalBlue;
-              // console.log(`【总金币】${$.totalGold}个\n`);
               console.log(`【总蓝币】${$.totalBlue}个\n`);
             }
           }
