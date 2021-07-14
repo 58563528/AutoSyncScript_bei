@@ -15,7 +15,7 @@ import * as dotenv from 'dotenv';
 import {getBeanShareCode, getFarmShareCode} from "./TS_USER_AGENTS";
 
 const CryptoJS = require('crypto-js')
-
+const notify = require('./sendNotify')
 dotenv.config()
 let appId: number = 10028, fingerprint: string | number, token: string = '', enCryptMethodJD: any;
 let cookie: string = '', cookiesArr: string[] = [], res: any = '', shareCodes: string[] = [];
@@ -24,7 +24,6 @@ let UserName: string, index: number, isLogin: boolean, nickName: string
 !(async () => {
   await requestAlgo();
   await requireConfig();
-
   for (let i = 0; i < cookiesArr.length; i++) {
     cookie = cookiesArr[i];
     UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)![1])
@@ -91,6 +90,22 @@ let UserName: string, index: number, isLogin: boolean, nickName: string
       console.log('可以倒垃圾')
     }
 
+    // 船来了
+    res = await api('user/QueryUserInfo', '_cfd_t,bizCode,ddwTaskId,dwEnv,ptag,source,strShareId,strZone', {ddwTaskId: '', strShareId: '', strMarkList: 'undefined'})
+    if (res.StoryInfo.StoryList) {
+      if (res.StoryInfo.StoryList[0].Special) {
+        console.log(`船来了，乘客是${res.StoryInfo.StoryList[0].Special.strName}`)
+        let shipRes: any = await api('story/SpecialUserOper', '_cfd_t,bizCode,ddwTriggerDay,dwEnv,dwType,ptag,source,strStoryId,strZone,triggerType', {strStoryId: res.StoryInfo.StoryList[0].strStoryId, dwType: '2', triggerType: 0, ddwTriggerDay: res.StoryInfo.StoryList[0].ddwTriggerDay})
+        console.log(shipRes)
+        console.log('正在下船，等待30s')
+        await wait(30000)
+        shipRes = await api('story/SpecialUserOper', '_cfd_t,bizCode,ddwTriggerDay,dwEnv,dwType,ptag,source,strStoryId,strZone,triggerType', {strStoryId: res.StoryInfo.StoryList[0].strStoryId, dwType: '3', triggerType: 0, ddwTriggerDay: res.StoryInfo.StoryList[0].ddwTriggerDay})
+        if (shipRes.iRet === 0)
+          console.log('船客接待成功')
+        else
+          console.log('船客接待失败', shipRes)
+      }
+    }
 
     // 任务➡️
     let tasks: any
@@ -165,7 +180,7 @@ let UserName: string, index: number, isLogin: boolean, nickName: string
   for (let i = 0; i < cookiesArr.length; i++) {
     for (let j = 0; j < shareCodes.length; j++) {
       cookie = cookiesArr[i]
-      console.log('去助力:', shareCodes[j])
+      console.log(`账号${i + 1}去助力:`, shareCodes[j])
       res = await api('story/helpbystage', '_cfd_t,bizCode,dwEnv,ptag,source,strShareId,strZone', {strShareId: shareCodes[j]})
       console.log('助力:', res)
       if (res.iRet === 2232 || res.sErrMsg === '今日助力次数达到上限，明天再来帮忙吧~') {
