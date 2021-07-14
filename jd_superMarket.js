@@ -24,7 +24,7 @@ let cookiesArr = [], cookie = '', jdSuperMarketShareArr = [], notify, newShareCo
 let jdNotify = true;//用来是否关闭弹窗通知，true表示关闭，false表示开启。
 let superMarketUpgrade = true;//自动升级,顺序:解锁升级商品、升级货架,true表示自动升级,false表示关闭自动升级
 let businessCircleJump = true;//小于对方300热力值自动更换商圈队伍,true表示运行,false表示禁止
-let drawLotteryFlag = false;//是否用500蓝币去抽奖，true表示开启，false表示关闭。默认关闭
+let drawLotteryFlag = true;//是否用500蓝币去抽奖，true表示开启，false表示关闭。默认关闭
 let joinPkTeam = true;//是否自动加入PK队伍
 let message = '', subTitle;
 const JD_API_HOST = 'https://api.m.jd.com/api';
@@ -86,10 +86,10 @@ async function jdSuperMarket() {
     await help();//商圈助力
     await smtgQueryPkTask();//做商品PK任务
     await drawLottery();//抽奖功能(招财进宝)
-    await myProductList();//货架
-    await upgrade();//升级货架和商品
-    await manageProduct();
-    await limitTimeProduct();
+    // await myProductList();//货架
+    // await upgrade();//升级货架和商品
+    // await manageProduct();
+    // await limitTimeProduct();
     await smtg_shopIndex();
     await smtgHome();
     await receiveUserUpgradeBlue();
