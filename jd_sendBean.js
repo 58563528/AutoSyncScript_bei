@@ -115,7 +115,7 @@ if ($.isNode()) {
 
 async function getActivityInfo(){
     $.activityList = [];
-    // await getActivityList();
+    await getActivityList();
     await getActivityList1();
     if($.activityList.length === 0){
         return ;
@@ -178,7 +178,7 @@ async function getActivityList1(){
 async function getActivityList(){
     return new Promise((resolve) => {
         let options = {
-            "url": `https://sendbeans.jd.com/common/api/bean/activity/get/entry/list/by/channel?channelId=14&channelType=H5&sendType=0&singleActivity=false&invokeKey=NRp8OPxZMFXmGkaE`,
+            "url": `https://sendbeans.jd.com/common/api/bean/activity/get/entry/list/by/channel?channelId=14&channelType=H5&sendType=0&singleActivity=false&invokeKey=qRKHmL4sna8ZOP9F`,
             "headers": {
                 "Host": "sendbeans.jd.com",
                 "Origin": "https://sendbeans.jd.com",
@@ -189,7 +189,7 @@ async function getActivityList(){
                 "Accept-Language": "zh-cn",
                 "Referer": "https://sendbeans.jd.com/dist/index.html?lng=120.273690&lat=31.525514&sid=c212f63c30c4bc6abfcc7889495d2acw&un_area=12_984_3382_0",
                 "Accept-Encoding": "gzip, deflate, br",
-                "openId": ""
+                "openId": "oPcgJ48NkJw3kCeK-BLdDxtahaI8"
             }
         };
         $.get(options, (err, resp, data) => {
