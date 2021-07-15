@@ -116,7 +116,7 @@ if ($.isNode()) {
 
 async function getActivityInfo(){
     $.activityList = [];
-    await getActivityList();
+    // await getActivityList();
     await getActivityList1();
     if($.activityList.length === 0){
         return ;
