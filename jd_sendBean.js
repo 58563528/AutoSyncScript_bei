@@ -1,7 +1,7 @@
 /*
 * 来客有礼小程序
-搬运不知名大佬的脚本
 * cron 45 4 * * *
+* 至少需要11个ck
 * */
 const $ = new Env('送豆得豆');
 const notify = $.isNode() ? require('./sendNotify') : '';
@@ -293,7 +293,7 @@ async function rewardMain(){
 async function rewardBean(){
     return new Promise((resolve) => {
         let options = {
-            "url": `https://draw.jdfcloud.com/common/api/bean/activity/sendBean?rewardRecordId=${$.rewardRecordId}&jdChannelId=&userSource=mp&appId=wxccb5c536b0ecd1bf&invokeKey=NRp8OPxZMFXmGkaE`,
+            "url": `https://draw.jdfcloud.com/common/api/bean/activity/sendBean?rewardRecordId=${$.rewardRecordId}&jdChannelId=&userSource=mp&appId=wxccb5c536b0ecd1bf&invokeKey=qRKHmL4sna8ZOP9F`,
             "headers":  {
                 'content-type' : `application/json`,
                 'Connection' : `keep-alive`,
@@ -338,7 +338,7 @@ function getRandomArrayElements(arr, count) {
 async function help() {
     await new Promise((resolve) => {
         let options = {
-            "url": `https://draw.jdfcloud.com/common/api/bean/activity/participate?activityId=${$.activityId}&inviteUserPin=${encodeURIComponent($.oneTuanInfo['user'])}&invokeKey=NRp8OPxZMFXmGkaE&timestap=${Date.now()}`,
+            "url": `https://draw.jdfcloud.com/common/api/bean/activity/participate?activityId=${$.activityId}&inviteUserPin=${encodeURIComponent($.oneTuanInfo['user'])}&invokeKey=qRKHmL4sna8ZOP9F&timestap=${Date.now()}`,
             "headers":  {
                 'content-type' : `application/json`,
                 'Connection' : `keep-alive`,
@@ -346,9 +346,9 @@ async function help() {
                 'App-Id' : `wxccb5c536b0ecd1bf`,
                 'Lottery-Access-Signature' : `wxccb5c536b0ecd1bf1537237540544h79HlfU`,
                 "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
-                'openId' : `oPcgJ48NkJw3kCeK-BLdDxtahaI8`,
+                'openId' : `oPcgJ4_X7uCMeTgGmar-rmiWst1Y`,
                 'Host' : `draw.jdfcloud.com`,
-                'Referer' : `https://servicewechat.com/wxccb5c536b0ecd1bf/737/page-frame.html`,
+                'Referer' : `https://servicewechat.com/wxccb5c536b0ecd1bf/733/page-frame.html`,
                 'cookie' : $.cookie,
             }
         };
@@ -373,7 +373,7 @@ async function help() {
 }
 
 async function invite() {
-    const url = `https://draw.jdfcloud.com/common/api/bean/activity/invite?openId=oPcgJ4_X7uCMeTgGmar-rmiWst1Y&activityId=${$.activityId}&userSource=mp&formId=123&jdChannelId=&fp=&appId=wxccb5c536b0ecd1bf&invokeKey=NRp8OPxZMFXmGkaE`;
+    const url = `https://draw.jdfcloud.com/common/api/bean/activity/invite?openId=oPcgJ4_X7uCMeTgGmar-rmiWst1Y&activityId=${$.activityId}&userSource=mp&formId=123&jdChannelId=&fp=&appId=wxccb5c536b0ecd1bf&invokeKey=qRKHmL4sna8ZOP9F`;
     const method = `POST`;
     const headers = {
         'content-type' : `application/json`,
@@ -415,7 +415,7 @@ async function invite() {
 
 
 async function getActivityDetail() {
-    const url = `https://draw.jdfcloud.com/common/api/bean/activity/detail?activityId=${$.activityId}&userOpenId=oPcgJ4_X7uCMeTgGmar-rmiWst1Y&timestap=${Date.now()}&userSource=mp&jdChannelId=&appId=wxccb5c536b0ecd1bf&invokeKey=NRp8OPxZMFXmGkaE`;
+    const url = `https://draw.jdfcloud.com/common/api/bean/activity/detail?activityId=${$.activityId}&userOpenId=oPcgJ4_X7uCMeTgGmar-rmiWst1Y&timestap=${Date.now()}&userSource=mp&jdChannelId=&appId=wxccb5c536b0ecd1bf&invokeKey=qRKHmL4sna8ZOP9F`;
     const method = `GET`;
     const headers = {
         'cookie' : $.cookie,
