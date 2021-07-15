@@ -26,7 +26,6 @@ if ($.isNode()) {
         return;
     }
     $.activityId = '';
-    $.completeNumbers = '';
     console.log(`开始获取活动信息`);
     for (let i = 0; i < cookiesArr.length && $.activityId === '' && i < 3; i++) {
         $.cookie = cookiesArr[i];
@@ -137,8 +136,6 @@ async function getActivityInfo(){
     }else{
         console.log(`获取活动详情成功`);
     }
-    $.completeNumbers = $.detail.activityInfo.completeNumbers;
-    console.log(`获取到的活动ID：${$.activityId},需要邀请${$.completeNumbers}人瓜分`);
 }
 
 async function getActivityList1(){
