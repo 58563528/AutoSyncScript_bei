@@ -106,6 +106,8 @@ function randomString(e) {
             $.hotFlag = false; //是否火爆
             console.log(`\n*****开始【京东账号${$.index}】${$.nickName || $.UserName}*****\n`);
             console.log(`\n如有未完成的任务，请多执行几次\n`);
+            await getToken();
+            $.cookie = $.cookie + "joyytoken=50085" + $.joyytoken + ";"
             await movement()
             if($.hotFlag)$.secretpInfo[$.UserName] = false;//火爆账号不执行助力
         }
@@ -142,6 +144,40 @@ function randomString(e) {
         $.done();
     })
 
+async function getToken() {
+    const options = {
+        "url": `https://bh.m.jd.com/gettoken`,
+        "body": `content={"appname":"50085","whwswswws":"jx9koYYZzpCW9sO0c/9+8vg==","body":{"platform":"3"}}`,
+        "headers": {
+            "Host": "bh.m.jd.com",
+            "content-type": "text/html; charset=utf-8",
+            "Connection": "keep-alive",
+            // "Cookie": $.cookie,
+            "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Mobile/15E148 Safari/604.1",
+            "Accept-Language": "zh-cn",
+            "Referer": "https://servicewechat.com/wx91d27dbf599dff74/549/page-frame.html",
+            "Accept-Encoding": "gzip,commpress, deflate, br"
+        }
+    }
+    return new Promise( (resolve) => {
+        $.post(options, (err, resp, data) => {
+            try {
+                // console.log('data1', data);
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`)
+                    console.log(`${$.name} API请求失败，请检查网路重试`)
+                } else {
+                    data = JSON.parse(data);
+                    $.joyytoken = data.joyytoken
+                }
+            } catch (e) {
+                $.logErr(e, resp);
+            } finally {
+                resolve(data);
+            }
+        })
+    })
+}
 
 async function movement() {
     try {
