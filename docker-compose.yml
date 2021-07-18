@@ -7,7 +7,7 @@ services:
     tty: true
     ports:
       - 5700:5700
-+     - 5701:5701
+      - 5701:5701
     environment:
       - ENABLE_HANGUP=true
       - ENABLE_WEB_PANEL=true
@@ -19,6 +19,6 @@ services:
       - ./raw:/ql/raw
       - ./scripts:/ql/scripts
       - ./jbot:/ql/jbot
-+     - ./ninja:/ql/ninja
+      - ./ninja:/ql/ninja
     labels:
       - com.centurylinklabs.watchtower.enable=false
