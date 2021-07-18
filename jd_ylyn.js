@@ -33,7 +33,7 @@ if ($.isNode()) {
 
 const JD_API_HOST = `https://api.m.jd.com/client.action`;
 message = ""
-$.shareuuid = "" //
+$.shareuuid = "9c92844e014a401f89333a3434b82303" //
 $.shareuuid1 = ""
     !(async () => {
         if (!cookiesArr[0]) {
@@ -78,20 +78,19 @@ $.shareuuid1 = ""
                 
                 if ($.cando) {
                     await join(100000000000168,1000013402)
-                   await saveCow()   
+                    await saveCow()   
                     await getUid($.shareuuid)
+                    await dotask(0)
+                    await dotask(1)
+                    await dotask(12)
+                    await dotask(13,"ziying")
+                    await dotask(13,"pop")
+                    await dotask(21)
+                    await feedCow()
+                    for (let i = 0; i < $.cs; i++) {
+                     await feedCow()   
+                    }
                     if($.index < 3){
-                        await dotask(0)
-                        await dotask(1)
-                        await dotask(12)
-                        await dotask(13,"ziying")
-                        await dotask(13,"pop")
-                        await dotask(21)
-                        await feedCow()
-                        for (let i = 0; i < $.cs; i++) {
-                         await feedCow()   
-                        }
-
                         for (let i = 0; i < $.cj; i++) {
                          await draw()   
                         }
@@ -104,18 +103,17 @@ $.shareuuid1 = ""
                     await join(100000000000168,1000013402)
                     await saveCow()   
                     await getUid($.shareuuid)
+                    await dotask(0)
+                    await dotask(1)
+                    await dotask(12)
+                    await dotask(13,"ziying")
+                    await dotask(13,"pop")
+                    await dotask(21)
+                    await feedCow()
+                    for (let i = 0; i < $.cs; i++) {
+                     await feedCow()   
+                    }
                     if($.index < 3){
-                        await dotask(0)
-                        await dotask(1)
-                        await dotask(12)
-                        await dotask(13,"ziying")
-                        await dotask(13,"pop")
-                        await dotask(21)
-                        await feedCow()
-                        for (let i = 0; i < $.cs; i++) {
-                         await feedCow()   
-                        }
-
                         for (let i = 0; i < $.cj; i++) {
                          await draw()   
                         }
