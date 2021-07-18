@@ -34,6 +34,7 @@ if ($.isNode()) {
 const JD_API_HOST = `https://api.m.jd.com/client.action`;
 message = ""
 $.shareuuid = "" //
+$.shareuuid1 = ""
     !(async () => {
         if (!cookiesArr[0]) {
             $.msg($.name, '【提示】请先获取cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/', {
@@ -74,27 +75,53 @@ $.shareuuid = "" //
                 await getMyPin()
                 await adlog()
                 await getUserInfo()
+                
                 if ($.cando) {
                     await join(100000000000168,1000013402)
                    await saveCow()   
                     await getUid($.shareuuid)
-                    await dotask(0)
-                    await dotask(1)
-                    await dotask(12)
-                    await dotask(13,"ziying")
-                    await dotask(13,"pop")
-                    await dotask(21)
-                    await feedCow()
-                    for (let i = 0; i < $.cs; i++) {
-                     await feedCow()   
-                    }
-                    
-                    for (let i = 0; i < $.cj; i++) {
-                     await draw()   
-                    }
-                    
+                    if($.index < 3){
+                        await dotask(0)
+                        await dotask(1)
+                        await dotask(12)
+                        await dotask(13,"ziying")
+                        await dotask(13,"pop")
+                        await dotask(21)
+                        await feedCow()
+                        for (let i = 0; i < $.cs; i++) {
+                         await feedCow()   
+                        }
 
+                        for (let i = 0; i < $.cj; i++) {
+                         await draw()   
+                        }
+                    }
                 }
+                let shareuuid = $.shareuuid;
+                if ($.cando) {
+                    $.shareuuid = $.shareuuid1;
+                    
+                    await join(100000000000168,1000013402)
+                    await saveCow()   
+                    await getUid($.shareuuid)
+                    if($.index < 3){
+                        await dotask(0)
+                        await dotask(1)
+                        await dotask(12)
+                        await dotask(13,"ziying")
+                        await dotask(13,"pop")
+                        await dotask(21)
+                        await feedCow()
+                        for (let i = 0; i < $.cs; i++) {
+                         await feedCow()   
+                        }
+
+                        for (let i = 0; i < $.cj; i++) {
+                         await draw()   
+                        }
+                    }
+                }
+                $.shareuuid = shareuuid;
             }
         }
 
@@ -365,8 +392,16 @@ function getUid() {
                            await join(100000000000168,1000013402)
                           
                            }
-                            $.shareuuid = data.data.actorUuid
-                            console.log(`\n【京东账号${$.index}（${$.UserName}）的${$.name}\n好友互助码】${$.shareuuid}\n`);
+                           if($.index == 1){
+                                $.shareuuid = data.data.actorUuid
+                                console.log(`\n【京东账号${$.index}（${$.UserName}）的${$.name}\n好友互助码】${$.shareuuid}\n`);
+                           }
+                           if($.index == 2){
+                                $.shareuuid1 = data.data.actorUuid
+                                console.log(`\n【京东账号${$.index}（${$.UserName}）的${$.name}\n好友互助码】${$.shareuuid1}\n`);
+                           }
+                           
+                           
                             
                             
                         }
