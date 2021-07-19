@@ -2,6 +2,9 @@
  * 京喜财富岛
  * 包含雇佣导游，建议每小时1次
  *
+ * 此版本暂定默认帮助HelloWorld，帮助助力池
+ * export HELP_HW = true    // 帮助HelloWorld
+ * export HELP_POOL = true  // 帮助助力池
  *
  * 使用jd_env_copy.js同步js环境变量到ts
  * 使用jd_ts_test.ts测试环境变量
@@ -9,7 +12,7 @@
 
 import {format} from 'date-fns';
 import axios from 'axios';
-import USER_AGENT, {TotalBean, getBeanShareCode, getFarmShareCode} from './TS_USER_AGENTS';
+import USER_AGENT, {requireConfig, TotalBean, getBeanShareCode, getFarmShareCode, getRandomNumberByRange, wait} from './TS_USER_AGENTS';
 import {Md5} from 'ts-md5'
 import * as dotenv from 'dotenv';
 
@@ -19,6 +22,10 @@ dotenv.config()
 let appId: number = 10028, fingerprint: string | number, token: string = '', enCryptMethodJD: any;
 let cookie: string = '', cookiesArr: string[] = [], res: any = '', shareCodes: string[] = [];
 
+let HELP_HW: string = process.env.HELP_HW ? process.env.HELP_HW : "true";
+console.log('帮助HelloWorld:', HELP_HW)
+let HELP_POOL: string = process.env.HELP_POOL ? process.env.HELP_POOL : "true";
+console.log('帮助助力池:', HELP_POOL)
 
 interface Params {
   strBuildIndex?: string,
@@ -55,7 +62,7 @@ interface Params {
 let UserName: string, index: number;
 !(async () => {
   await requestAlgo();
-  await requireConfig();
+  let cookiesArr: any = await requireConfig();
   for (let i = 0; i < cookiesArr.length; i++) {
     cookie = cookiesArr[i];
     UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)![1])
@@ -98,7 +105,8 @@ let UserName: string, index: number;
     for (let stage of res.stagelist) {
       if (res.dwCurProgress >= stage.dwCurStageEndCnt && stage.dwIsAward === 0) {
         let awardRes: any = await api('user/ComposeGameAward', '__t,dwCurStageEndCnt,strZone', {__t: Date.now(), dwCurStageEndCnt: stage.dwCurStageEndCnt})
-        console.log('珍珠领奖：', awardRes.ddwCoin)
+        console.log(awardRes)
+        console.log('珍珠领奖：', awardRes.ddwCoin, awardRes.addMonety)
         await wait(3000)
       }
     }
@@ -397,20 +405,6 @@ function decrypt(stk: string, url: string) {
   return encodeURIComponent(["".concat(timestamp.toString()), "".concat(fingerprint.toString()), "".concat(appId.toString()), "".concat(token), "".concat(hash2)].join(";"))
 }
 
-function requireConfig() {
-  return new Promise<void>(resolve => {
-    console.log('开始获取配置文件\n')
-    const jdCookieNode = require('./jdCookie.js');
-    Object.keys(jdCookieNode).forEach((item) => {
-      if (jdCookieNode[item]) {
-        cookiesArr.push(jdCookieNode[item])
-      }
-    })
-    console.log(`共${cookiesArr.length}个京东账号\n`)
-    resolve()
-  })
-}
-
 function generateFp() {
   let e = "0123456789";
   let a = 13;
@@ -425,16 +419,4 @@ function getQueryString(url: string, name: string) {
   let r = url.split('?')[1].match(reg);
   if (r != null) return unescape(r[2]);
   return '';
-}
-
-function wait(t: number) {
-  return new Promise<void>(resolve => {
-    setTimeout(() => {
-      resolve()
-    }, t)
-  })
-}
-
-function getRandomNumberByRange(start: number, end: number): number {
-  return Math.floor(Math.random() * (end - start) + start)
 }

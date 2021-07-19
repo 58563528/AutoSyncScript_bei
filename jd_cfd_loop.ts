@@ -5,7 +5,7 @@
 
 import {format} from 'date-fns'
 import axios from 'axios'
-import USER_AGENT from './TS_USER_AGENTS'
+import USER_AGENT, {TotalBean, requireConfig, wait, getRandomNumberByRange} from './TS_USER_AGENTS'
 import * as dotenv from 'dotenv'
 
 const CryptoJS = require('crypto-js')
@@ -15,13 +15,13 @@ const notify = require('./sendNotify')
 dotenv.config()
 
 let appId: number = 10028, fingerprint: string | number, token: string, enCryptMethodJD: any;
-let cookie: string = '', cookiesArr: Array<string> = [], res: any = '';
+let cookie: string = '', res: any = '';
 process.env.CFD_LOOP_DELAY ? console.log('设置延迟:', parseInt(process.env.CFD_LOOP_DELAY)) : console.log('设置延迟:10000~25000随机')
 
-let UserName: string, index: number, isLogin: boolean, nickName: string
+let UserName: string, index: number;
 !(async () => {
   await requestAlgo();
-  await requireConfig();
+  let cookiesArr: any = await requireConfig();
 
   let filename: string = __filename.split('/').pop()!
   let stream = fs.createReadStream(filename);
@@ -46,24 +46,27 @@ let UserName: string, index: number, isLogin: boolean, nickName: string
           } else {
             console.log('MD5校验通过！')
           }
-        }).catch(e => {
+        }).catch(() => {
 
     })
   });
 
   while (1) {
-    try {
-      for (let i = 0; i < cookiesArr.length; i++) {
-        cookie = cookiesArr[i];
-        UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)![1])
-        index = i + 1;
-        isLogin = true;
-        nickName = '';
-        console.log(`\n开始【京东账号${index}】${nickName || UserName}\n`);
 
+    for (let i = 0; i < cookiesArr.length; i++) {
+      cookie = cookiesArr[i];
+      UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)![1])
+      index = i + 1;
+      let {isLogin, nickName}: any = await TotalBean(cookie)
+      if (!isLogin) {
+        notify.sendNotify(__filename.split('/').pop(), `cookie已失效\n京东账号${index}：${nickName || UserName}`)
+        continue
+      }
+      console.log(`\n开始【京东账号${index}】${nickName || UserName}\n`);
+      try {
         res = await speedUp('_cfd_t,bizCode,dwEnv,ptag,source,strBuildIndex,strZone')
         if (res.iRet !== 0) {
-          console.log('去手动新手教程')
+          console.log('手动建造4个房子')
           continue
         }
         console.log('今日热气球:', res.dwTodaySpeedPeople, '/', 20)
@@ -72,7 +75,7 @@ let UserName: string, index: number, isLogin: boolean, nickName: string
           for (let s of shell.Data.NormShell) {
             for (let j = 0; j < s.dwNum; j++) {
               res = await speedUp('_cfd_t,bizCode,dwEnv,dwType,ptag,source,strZone', s.dwType)
-              if (res.iRet !== 0){
+              if (res.iRet !== 0) {
                 console.log(res)
                 break
               }
@@ -81,12 +84,11 @@ let UserName: string, index: number, isLogin: boolean, nickName: string
             }
           }
         }
+      } catch (e) {
+        console.log(e)
       }
-    } catch (e) {
-      console.log(e)
-      break
     }
-    let t: number = process.env.CFD_LOOP_DELAY ? parseInt(process.env.CFD_LOOP_DELAY) : getRandomNumberByRange(10000, 25000)
+    let t: number = process.env.CFD_LOOP_DELAY ? parseInt(process.env.CFD_LOOP_DELAY) : getRandomNumberByRange(1000 * 10, 1000 * 30)
     await wait(t)
   }
 })()
@@ -110,7 +112,7 @@ function speedUp(stk: string, dwType?: number) {
       })
       resolve(data)
     } catch (e) {
-      reject(e)
+      reject(502)
     }
   })
 }
@@ -174,20 +176,6 @@ function decrypt(stk: string, url: string) {
   return encodeURIComponent(["".concat(timestamp.toString()), "".concat(fingerprint.toString()), "".concat(appId.toString()), "".concat(token), "".concat(hash2)].join(";"))
 }
 
-function requireConfig() {
-  return new Promise<void>(resolve => {
-    console.log('开始获取配置文件\n')
-    const jdCookieNode = require('./jdCookie.js');
-    Object.keys(jdCookieNode).forEach((item) => {
-      if (jdCookieNode[item]) {
-        cookiesArr.push(jdCookieNode[item])
-      }
-    })
-    console.log(`共${cookiesArr.length}个京东账号\n`)
-    resolve()
-  })
-}
-
 function generateFp() {
   let e = "0123456789";
   let a = 13;
@@ -202,16 +190,4 @@ function getQueryString(url: string, name: string) {
   let r = url.split('?')[1].match(reg);
   if (r != null) return unescape(r[2]);
   return '';
-}
-
-function wait(t: number) {
-  return new Promise<void>(resolve => {
-    setTimeout(() => {
-      resolve()
-    }, t)
-  })
-}
-
-function getRandomNumberByRange(start: number, end: number): number {
-  return Math.floor(Math.random() * (end - start) + start)
 }
