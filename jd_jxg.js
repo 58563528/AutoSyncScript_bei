@@ -126,12 +126,14 @@ async function jxg(){
         console.log(`获取任务列表失败`);
     }else{
         await $.wait(2000);
-        if($.in < 6){
+        if($.index < 6){
             await doMission();//做任务
         }
 
     }
-    await getCardInfo();
+    if($.index < 6){
+        await getCardInfo();
+    }
     await $.wait(2000);
     $.synthesisType = true;
     for (let i = 0; i < $.cardList.length && i <  7; i++) {
