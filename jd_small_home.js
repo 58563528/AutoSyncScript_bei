@@ -74,9 +74,8 @@ const JD_API_HOST = 'https://lkyl.dianpusoft.cn/api';
         }
         continue
       }
-      if($.index < 6){
-        await smallHome();
-      }
+      await smallHome();
+
     }
   }
   for (let i = 0; i < cookiesArr.length; i++) {
@@ -107,9 +106,12 @@ async function smallHome() {
     // await helpFriends();
     if (!$.isUnLock) return;
     await createInviteUser();
-    await queryDraw();
-    await lottery();
-    await doAllTask();
+
+    if($.index < 6){
+      await queryDraw();
+      await lottery();
+      await doAllTask();
+    }
     await queryByUserId();
     await queryFurnituresCenterList();
     await showMsg();
