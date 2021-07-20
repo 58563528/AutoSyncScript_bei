@@ -419,7 +419,7 @@ async function getNewShare(){
         $.post(myRequest, (err, resp, data) => {
             try {
                 data = JSON.parse(data);
-                if(data.success === true){
+                if(data.success === true && $.index < 6){
                     $.helpCodeList[$.UserName] = data.content;
                     console.log(`互助码：${data.content}`);
                 }
