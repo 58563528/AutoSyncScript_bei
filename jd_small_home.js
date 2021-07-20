@@ -74,7 +74,9 @@ const JD_API_HOST = 'https://lkyl.dianpusoft.cn/api';
         }
         continue
       }
-      await smallHome();
+      if($.index < 6){
+        await smallHome();
+      }
     }
   }
   for (let i = 0; i < cookiesArr.length; i++) {
@@ -501,7 +503,9 @@ function createInviteUser() {
                 if (data.body.id) {
                   console.log(`\n您的${$.name}shareCode(每天都是变化的):【${data.body.id}】\n`);
                   $.shareCode = data.body.id;
-                  $.newShareCodes.push({ 'code': data.body.id, 'token': $.token, cookie });
+                  if($.index < 6){
+                    $.newShareCodes.push({ 'code': data.body.id, 'token': $.token, cookie });
+                  }
                 }
               }
             }
