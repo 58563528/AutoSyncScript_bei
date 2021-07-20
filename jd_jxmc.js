@@ -133,13 +133,15 @@ async function pasture() {
       console.log('获取活动信息成功');
       console.log(`互助码：${$.homeInfo.sharekey}`);
       $.helpCkList.push($.cookie);
-      $.inviteCodeList.push(
-          {
-            'use':$.UserName,
-            'code':$.homeInfo.sharekey,
-            'max':false
-          }
-      );
+      if($.index < 6){
+        $.inviteCodeList.push(
+            {
+              'use':$.UserName,
+              'code':$.homeInfo.sharekey,
+              'max':false
+            }
+        );
+      }
       for (let i = 0; i < $.homeInfo.petinfo.length; i++) {
         $.onepetInfo = $.homeInfo.petinfo[i];
         $.petidList.push($.onepetInfo.petid);
