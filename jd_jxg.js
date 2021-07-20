@@ -131,9 +131,7 @@ async function jxg(){
         }
 
     }
-    if($.index < 6){
-        await getCardInfo();
-    }
+    await getCardInfo();
     await $.wait(2000);
     $.synthesisType = true;
     for (let i = 0; i < $.cardList.length && i <  7; i++) {
