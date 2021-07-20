@@ -126,7 +126,6 @@ async function main() {
     $.msg($.name, '【提示】请先获取来客有礼宠汪汪token', "iOS用户微信搜索'来客有礼'小程序\n点击底部的'发现'Tab\n即可获取Token");
     // return;
   }
-  await getFriendPins();
   for (let i = 0; i < cookiesArr.length; i++) {
     if (cookiesArr[i]) {
       $.validate = '';
@@ -548,32 +547,7 @@ function getRandomArrayElements(arr, count) {
   }
   return shuffled.slice(min);
 }
-function getFriendPins() {
-  return new Promise(resolve => {
-    $.get({
-      url: "https://cdn.jsdelivr.net/gh/gitupdate/friendPin@main/friendPins.json",
-      headers:{
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 Edg/87.0.4280.88"
-      },
-      timeout: 100000}, async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`getFriendPins::${JSON.stringify(err)}`);
-        } else {
-          $.friendPins = data && JSON.parse(data);
-          if ($.friendPins && $.friendPins['friendsArr']) {
-            friendsArr = $.friendPins['friendsArr'];
-            console.log(`\n共提供 ${friendsArr.length}个好友供来进行邀请助力\n`)
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
+
 isRequest ? getToken() : main();
 
 
