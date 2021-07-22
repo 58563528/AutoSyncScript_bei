@@ -91,7 +91,7 @@ let UserName: string, index: number;
             if (res.iRet === 2232 || res.sErrMsg === '今日助力次数达到上限，明天再来帮忙吧~') {
                 break
             }
-            await wait(3000)
+            await wait(10000)
         }
     }
 })()
