@@ -76,8 +76,10 @@ let UserName: string, index: number;
         console.log(`\n开始【京东账号${index}】${nickName || UserName}\n`);
 
         try {
-            await makeShareCodes();
-            await wait(10000)
+            if(index < 6){
+                await makeShareCodes();
+                await wait(5000)
+            }
         } catch (e) {
             console.log(e)
         }
@@ -92,7 +94,7 @@ let UserName: string, index: number;
             if (res.iRet === 2232 || res.sErrMsg === '今日助力次数达到上限，明天再来帮忙吧~') {
                 break
             }
-            await wait(10000)
+            await wait(5000)
         }
     }
 })()
@@ -125,28 +127,26 @@ function api(fn: string, stk: string, params: Params = {}) {
 }
 
 function makeShareCodes() {
-    if(index < 6){
-        return new Promise<void>(async (resolve, reject) => {
-            let bean: string = await getBeanShareCode(cookie)
-            let farm: string = await getFarmShareCode(cookie)
-            res = await api('user/QueryUserInfo', '_cfd_t,bizCode,ddwTaskId,dwEnv,ptag,source,strShareId,strZone', {ddwTaskId: '', strShareId: '', strMarkList: 'undefined'})
-            console.log('助力码:', res.strMyShareId)
-            shareCodes.push(res.strMyShareId)
-            let pin: string = cookie.match(/pt_pin=([^;]*)/)![1]
-            pin = Md5.hashStr(pin)
-            axios.get(`https://api.sharecode.ga/api/autoInsert?db=jxcfd&code=${res.strMyShareId}&bean=${bean}&farm=${farm}&pin=${pin}`)
-                .then(res => {
-                    if (res.data.code === 200)
-                        console.log('已自动提交助力码')
-                    else
-                        console.log('提交失败！已提交farm和bean的cookie才可提交cfd')
-                    resolve()
-                })
-                .catch(e => {
-                    reject('访问助力池出错')
-                })
-        })
-    }
+    return new Promise<void>(async (resolve, reject) => {
+        let bean: string = await getBeanShareCode(cookie)
+        let farm: string = await getFarmShareCode(cookie)
+        res = await api('user/QueryUserInfo', '_cfd_t,bizCode,ddwTaskId,dwEnv,ptag,source,strShareId,strZone', {ddwTaskId: '', strShareId: '', strMarkList: 'undefined'})
+        console.log('助力码:', res.strMyShareId)
+        shareCodes.push(res.strMyShareId)
+        let pin: string = cookie.match(/pt_pin=([^;]*)/)![1]
+        pin = Md5.hashStr(pin)
+        axios.get(`https://api.sharecode.ga/api/autoInsert?db=jxcfd&code=${res.strMyShareId}&bean=${bean}&farm=${farm}&pin=${pin}`)
+            .then(res => {
+                if (res.data.code === 200)
+                    console.log('已自动提交助力码')
+                else
+                    console.log('提交失败！已提交farm和bean的cookie才可提交cfd')
+                resolve()
+            })
+            .catch(e => {
+                reject('访问助力池出错')
+            })
+    })
 }
 
 async function requestAlgo() {
