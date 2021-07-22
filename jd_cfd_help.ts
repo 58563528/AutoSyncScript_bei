@@ -77,6 +77,7 @@ let UserName: string, index: number;
 
         try {
             await makeShareCodes();
+            await wait(10000)
         } catch (e) {
             console.log(e)
         }
