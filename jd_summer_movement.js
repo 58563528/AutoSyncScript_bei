@@ -892,7 +892,7 @@ function getRandomArrayElements(arr, count) {
 
 // 正道的光
 function aabbiill(){
-    return ccdd == 1
+    return true
 }
 
 // 随机数
