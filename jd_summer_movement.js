@@ -892,12 +892,6 @@ function getRandomArrayElements(arr, count) {
 
 // 正道的光
 function aabbiill(){
-    let ccdd = 0
-    if(new Date().getUTCHours() + 8 >= 18 && new Date().getUTCHours() + 8 < 24){
-        ccdd = 1
-    }else{
-        ccdd = getRndInteger(0,3)
-    }
     return ccdd == 1
 }
 
